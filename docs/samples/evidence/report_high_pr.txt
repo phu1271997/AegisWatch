@@ -1,0 +1,29 @@
+Disclosed fix PR #1834 — acme-swap/acme-swap-core
+
+Title: security: include (chainId, nonce, deadline) in EIP-712 domain for withdraw
+Status: merged, released as 4.2.4
+Reviewers: 3 core maintainers + 2 external security auditors
+
+Diff summary
+------------
+- contracts/Withdraw.sol:
+    add uint256 chainId, uint256 nonce, uint64 deadline to the signed struct
+    verify(nonce == nonces[signer]++, "AS: nonce")
+    verify(chainId == block.chainid, "AS: chainId")
+    verify(deadline == 0 || block.timestamp <= deadline, "AS: deadline")
+- test/Withdraw.replay.t.sol:
+    new test replay_across_deployments_reverts (previously silently succeeded)
+- CHANGELOG.md:
+    entry references GHSA-EX01-9999-AAAA
+
+Auditor sign-offs
+-----------------
+- BlueOwl Labs: pattern matches the documented replay class in their 2025
+  survey; the added domain fields close the surface entirely.
+- mtx-audits: rebased canary reproduction script — with 4.2.4 the drain is
+  refused at the signature check, gas is refunded, no state change.
+
+Public conversation
+-------------------
+- Maintainer post-mortem: acme-swap.example/blog/2026-03-post-mortem
+- CTO acknowledged the exposure and thanked reporters on X: @acmeswap_eng

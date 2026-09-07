@@ -1,0 +1,33 @@
+MEDIUM — Unbounded loop in NimbusVoting.tallyBallots enables gas grief
+
+Origin: individual researcher writeup (validated by one Nimbus core dev on
+follow-up).
+
+Observation
+-----------
+The NimbusVoting.tallyBallots function iterates every ballot in a single call,
+with no per-call limit. On the reference deployment (chain-id 47502) a
+malicious proposer with 61,000 stub voters can push tallyBallots above the
+current block gas limit, causing tally to be permanently unfinalisable and
+freezing proposal execution.
+
+Reproduction
+------------
+Repro repository (public): github.com/example-researcher/nimbus-tally-grief
+Runs a fork of the mainnet state, inflates the voter count, calls tallyBallots
+and observes the tx run out of gas. Confirmed on gas-limit 30M and 40M forks.
+
+Corroboration
+-------------
+Follow-up thread with a Nimbus maintainer confirming the class of issue and
+proposing a paginated tally as the fix:
+  https://forum.nimbus.example/t/tally-pagination-proposal/8842
+
+Not yet in an advisory — the maintainer team scheduled a fix but has not
+released it as of the reporting date.
+
+Why MEDIUM
+----------
+Real defect, exploitable, but only impacts proposals actively tallying; funds
+are not lost, only frozen for that proposal. Confirmed by only one independent
+source (the Nimbus maintainer thread). Merits a bounty payout below HIGH.

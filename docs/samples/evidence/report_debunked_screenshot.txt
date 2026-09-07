@@ -1,0 +1,32 @@
+DEBUNKED — "AcmeSwap oracle price is being manipulated"
+
+Alleged issue
+-------------
+Reporter claims that the AcmeSwap price oracle returns a value inconsistent
+with Coinbase for a five-second window during every block reorg, and that the
+delta lets an attacker profitably front-run swaps.
+
+Evidence supplied
+-----------------
+Only source is a single screenshot the reporter says was taken on their own
+machine. The screenshot shows a browser dev tools console printing what looks
+like a price feed, but no timestamp is legible, no block number is included,
+and the URL bar is cropped out. No script, no code, no chain trace.
+
+Findings on independent verification
+------------------------------------
+1. The AcmeSwap oracle publishes every quote with block number and signature
+   at oracle.acme-swap.example/history. Pulling the last 10,000 quotes and
+   diffing against Coinbase minute-bars for the same window shows no gap
+   exceeding 0.11% — well inside expected slippage, no five-second anomaly.
+2. AcmeSwap maintainers publicly refuted the same claim in Discord on
+   2026-04-02 and posted the diff script for anyone to reproduce.
+3. The reporter's screenshot is a re-post: an identical image circulated on X
+   in January 2026 attributed to a different account. The prior post was
+   marked as misleading by three community moderators.
+
+Conclusion
+----------
+No independent evidence corroborates the claim. The one image provided has
+already been publicly rebutted with reproducible data. Report classified as
+DEBUNKED; reporter's bond is forfeited to the pool per AegisWatch rules.

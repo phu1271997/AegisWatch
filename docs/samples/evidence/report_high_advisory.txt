@@ -1,0 +1,48 @@
+GHSA-EX01-9999-AAAA — Signature-replay in AcmeSwap /api/withdraw
+
+Severity: HIGH
+Status: PUBLISHED
+Affected: acme-swap-core, versions 4.0.0 through 4.2.3
+Fixed in: 4.2.4
+
+Summary
+-------
+The AcmeSwap withdrawal handler accepts a signed EIP-712 payload but does not
+include a nonce or chain id in the signature domain. A signed withdrawal message
+can be re-broadcast against a fresh AcmeSwap instance, draining the destination
+vault without the signer's consent. Two independent researchers (BlueOwl Labs
+and mtx-audits) confirmed the primitive by replaying a canary signature against
+a staging deployment and observing the vault balance drop to zero.
+
+Proof of Concept
+----------------
+Reproduction script is attached to the disclosed fix PR at:
+  https://github.com/acme-swap/acme-swap-core/pull/1834
+It replays a signed message captured from the mainnet withdrawal on
+block 22301774, using the same signer key but a new destination vault
+address. Test suite exit code: 0 (vault drained as expected).
+
+Impact
+------
+On-chain financial loss for every AcmeSwap instance still on 4.2.x, including
+three community-run forks. Estimated exposed TVL at time of disclosure:
+$18.4M across 11 chains.
+
+Recommendation
+--------------
+Upgrade to 4.2.4 or later. If upgrade cannot happen immediately, pause the
+withdrawal facet via the multisig. AcmeSwap maintainers have already rotated
+the signer.
+
+Disclosure timeline
+-------------------
+- Day 0  Report received by AcmeSwap security team
+- Day 3  Fix drafted, pause enacted on mainnet
+- Day 8  4.2.4 released and mirrors updated
+- Day 21 Coordinated public disclosure (this advisory)
+
+Corroboration
+-------------
+- Signed acknowledgement from AcmeSwap: https://github.com/acme-swap/acme-swap-core/security/advisories/GHSA-EX01-9999-AAAA
+- Mirror on The Standard: https://thestandard.example/2026/03/acme-swap-signature-replay
+- On-chain trace of pre-fix drain on the canary vault, block 22301774.
