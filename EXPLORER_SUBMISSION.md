@@ -3,7 +3,7 @@
 
 ## Pre-submit gate status
 
-- Contract deployed on studionet: `TO_BE_FILLED_AFTER_DEPLOY` — verify with `gen_getContractSchema` before submitting.
+- Contract deployed on studionet: `0x10781FE67637d391Faa5Ad63AF4fE41e0261304b` — verify with `gen_getContractSchema` before submitting.
 - Live app: https://aegis-watch-app.vercel.app — MetaMask connect, chain auto-switch, Recent Reports browsable without a wallet.
 - Seed data required before Submit: 1 HIGH_VERIFIED, 1 MEDIUM_VERIFIED, 1 DEBUNKED on Program 0. Run `scripts/seed.mjs` with the funded key (see README §8).
 - Explorer URL after deploy: `https://explorer-studio.genlayer.com/address/<contract>` — open in a browser and confirm `convene_verifier` transactions show `GENVM RESULT: SUCCESS` and `CONSENSUS RESULT: Accepted` before hitting Submit.
@@ -78,7 +78,7 @@ Recent Reports shows three RESOLVED reports on Program 0 with distinct tiers: on
 ## Contract link
 `https://explorer-studio.genlayer.com/address/<contract>`
 
-- **Address:** `TO_BE_FILLED_AFTER_DEPLOY`
+- **Address:** `0x10781FE67637d391Faa5Ad63AF4fE41e0261304b`
 - **Network:** studionet (GenLayer Studio hosted)
 - **Status:** **Preview** (studionet ≠ testnet)
 - **Verify before submit:** open the Explorer link and confirm at least one `convene_verifier` transaction with `Result: SUCCESS` and `Consensus: Accepted`.
