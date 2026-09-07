@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AegisWatch — On-Chain Bounty Verification</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg" />
+<link rel="apple-touch-icon" href="/logo-512.png" />
+<meta name="description" content="AegisWatch — decentralized bug-bounty and whistleblower report verifier on GenLayer. AI validators read public evidence, assign a severity tier, and settle payouts on-chain." />
+<meta property="og:title" content="AegisWatch — On-Chain Bounty Verification" />
+<meta property="og:description" content="AI validators read the evidence, assign a severity tier, settle the bounty. GenLayer studionet." />
+<meta property="og:image" content="/logo-1024.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Palette: cyber-forensic incident response */
+    --bg:#0b0d10;
+    --bg-2:#12161c;
+    --panel:#161b22;
+    --panel-2:#1c222b;
+    --line:#242c37;
+    --line-2:#2f3946;
+    --text:#dae2ee;
+    --muted:#7a8798;
+    --muted-2:#586573;
+    --scan:#1a2029;
+
+    --sev-high:#ff4d6d;      /* HIGH — critical red */
+    --sev-medium:#ffb84d;    /* MEDIUM — amber */
+    --sev-low:#ffea7f;       /* LOW — yellow */
+    --sev-debunked:#7a8798;  /* DEBUNKED — gray */
+    --sev-insuff:#6f7fb3;    /* INSUFFICIENT — muted blue */
+    --sev-pending:#5eead4;   /* PENDING — teal */
+    --accent:#5eead4;        /* terminal cursor / active */
+    --accent-2:#3ec6b0;
+    --danger:#ff4d6d;
+    --ok:#4ade80;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.55;min-height:100vh}
+  body{
+    background-image:
+      radial-gradient(circle at 12% -5%, rgba(94,234,212,.08), transparent 40%),
+      radial-gradient(circle at 92% 10%, rgba(255,77,109,.06), transparent 45%),
+      linear-gradient(180deg, #0b0d10 0%, #0a0c10 100%);
+    background-attachment:fixed;
+  }
+  a{color:var(--accent-2)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px 100px}
+  .mono{font-family:'JetBrains Mono',monospace}
+
+  /* ── Top navbar ─────────────────────────────────────────────── */
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    padding:22px 0 18px;border-bottom:1px solid var(--line);
+  }
+  .brandline{display:flex;align-items:center;gap:14px}
+  .brandline img{width:44px;height:44px;border-radius:9px;flex-shrink:0}
+  .brandline .name{font-weight:700;font-size:19px;letter-spacing:.01em}
+  .brandline .tick{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase}
+
+  .netpill{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
+    color:var(--accent);background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.25);
+    padding:6px 11px;border-radius:999px;text-transform:uppercase;
+    display:flex;align-items:center;gap:8px;
+  }
+  .netpill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+  .wallet-wrap{display:flex;align-items:center;gap:12px}
+  .connect{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    background:var(--accent);color:#0a0f0d;border:none;padding:11px 18px;font-weight:700;
+    cursor:pointer;border-radius:6px;transition:background .15s;
+  }
+  .connect:hover{background:var(--accent-2)}
+  .connect:disabled{opacity:.6;cursor:not-allowed}
+  .addr{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+
+  /* ── Hero / mission strip ───────────────────────────────────── */
+  .hero{
+    margin:26px 0 8px;padding:28px 28px 22px;
+    background:linear-gradient(135deg, rgba(20,25,32,.9) 0%, rgba(18,22,28,.9) 100%);
+    border:1px solid var(--line);border-radius:10px;position:relative;overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px);
+  }
+  .hero-eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;
+    color:var(--sev-pending);text-transform:uppercase;margin-bottom:10px;
+  }
+  .hero h1{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:30px;line-height:1.15;letter-spacing:-.01em;
+    margin-bottom:10px;max-width:820px;
+  }
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:760px}
+
+  /* Severity chip legend under hero */
+  .sev-legend{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;
+  }
+  .sev-chip{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:3px;
+    background:var(--bg-2);border:1px solid var(--line-2);color:var(--muted);text-transform:uppercase;
+  }
+  .sev-chip .dot{width:8px;height:8px;border-radius:2px}
+  .sev-chip.high .dot{background:var(--sev-high)}
+  .sev-chip.med  .dot{background:var(--sev-medium)}
+  .sev-chip.low  .dot{background:var(--sev-low)}
+  .sev-chip.deb  .dot{background:var(--sev-debunked)}
+  .sev-chip.ins  .dot{background:var(--sev-insuff)}
+
+  /* ── Tabs ────────────────────────────────────────────────────── */
+  nav.tabs{
+    display:flex;gap:0;margin:32px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;
+  }
+  nav.tabs button{
+    background:none;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    padding:14px 18px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;
+  }
+  nav.tabs button:hover{color:var(--text)}
+  nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  .panel{display:none;padding:28px 0}
+  .panel.active{display:block}
+
+  /* ── Card / form ─────────────────────────────────────────────── */
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:26px;margin-bottom:18px;
+    position:relative;
+  }
+  .card h3{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:16px;
+    display:flex;align-items:center;gap:10px;margin-bottom:4px;
+  }
+  .card h3::before{
+    content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);box-shadow:0 0 8px rgba(94,234,212,.5);
+  }
+  .card .sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+
+  label{
+    display:block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);margin:16px 0 6px;
+  }
+  label .hint{color:var(--muted-2);font-weight:400;text-transform:none;letter-spacing:.02em;margin-left:6px}
+
+  input, textarea, select{
+    width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);
+    background:var(--bg-2);border:1px solid var(--line-2);border-radius:5px;padding:11px 12px;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  input:focus, textarea:focus, select:focus{
+    outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,234,212,.15);
+  }
+  textarea{resize:vertical;min-height:78px;font-size:12.5px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:180px}
+
+  button.act{
+    margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;font-weight:700;background:var(--accent);color:#0a0f0d;
+    border:none;padding:13px 26px;cursor:pointer;border-radius:5px;transition:background .15s,transform .05s;
+  }
+  button.act:hover{background:var(--accent-2)}
+  button.act:active{transform:translateY(1px)}
+  button.act:disabled{background:var(--line-2);color:var(--muted);cursor:not-allowed}
+  button.ghost{
+    background:transparent;border:1px solid var(--line-2);color:var(--text);
+  }
+  button.ghost:hover{border-color:var(--accent);color:var(--accent);background:transparent}
+
+  /* ── Status pill ─────────────────────────────────────────────── */
+  .status{
+    display:none;align-items:center;gap:10px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    margin-top:16px;padding:10px 14px;border-radius:5px;border:1px solid transparent;
+  }
+  .status.show{display:flex}
+  .status.work{background:rgba(94,234,212,.08);color:var(--accent);border-color:rgba(94,234,212,.25)}
+  .status.ok{background:rgba(74,222,128,.08);color:var(--ok);border-color:rgba(74,222,128,.25)}
+  .status.err{background:rgba(255,77,109,.08);color:var(--danger);border-color:rgba(255,77,109,.25)}
+  .spin{width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;flex-shrink:0}
+  @keyframes s{to{transform:rotate(360deg)}}
+
+  /* ── Report card in Recent list ──────────────────────────────── */
+  .rlist{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+  .rrow{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:14px 16px;
+    cursor:pointer;transition:border-color .15s,transform .05s;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .rrow:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .rrow .head{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  }
+  .rrow .idlabel{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .rrow .idlabel b{color:var(--text)}
+  .rrow .reason{font-size:12.5px;color:var(--muted);line-height:1.5}
+
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:4px 10px;border-radius:3px;font-weight:700;
+    background:var(--bg);border:1px solid;
+  }
+  .badge.high     {color:var(--sev-high);   border-color:var(--sev-high)}
+  .badge.medium   {color:var(--sev-medium); border-color:var(--sev-medium)}
+  .badge.low      {color:var(--sev-low);    border-color:var(--sev-low)}
+  .badge.debunked {color:var(--sev-debunked);border-color:var(--sev-debunked)}
+  .badge.insuff   {color:var(--sev-insuff); border-color:var(--sev-insuff)}
+  .badge.pending  {color:var(--sev-pending);border-color:var(--sev-pending)}
+  .badge.withdrawn{color:var(--muted);      border-color:var(--muted)}
+
+  /* ── Verdict detail block ────────────────────────────────────── */
+  .verdict{
+    margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  }
+  .verdict .vhead{
+    background:var(--bg-2);border-bottom:1px solid var(--line);padding:16px 22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  }
+  .verdict .vhead .id{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.06em}
+  .verdict .vhead .id b{color:var(--text)}
+  .verdict .vbody{padding:22px}
+  .payout-row{
+    display:flex;gap:26px;flex-wrap:wrap;padding:14px 0;border-bottom:1px dashed var(--line);
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);
+  }
+  .payout-row div span:first-child{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);margin-bottom:3px}
+  .payout-row div span:last-child{color:var(--text);font-weight:700}
+
+  .reason{
+    margin-top:18px;padding:16px 18px;background:var(--bg-2);border-left:3px solid var(--accent);
+    border-radius:0 5px 5px 0;font-size:13.5px;line-height:1.6;
+  }
+  .reason .rl{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px;
+  }
+  .reason .rl::before{content:"$";color:var(--muted-2)}
+
+  .injection{
+    margin-top:14px;padding:12px 16px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.35);
+    border-radius:5px;color:var(--sev-high);font-family:'JetBrains Mono',monospace;font-size:12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .injection::before{content:"⚠";font-size:16px}
+
+  .ev{
+    margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+  }
+  .ev-item{margin-top:6px}
+  .ev-item a{color:var(--accent-2);text-decoration:none;border-bottom:1px dashed var(--accent-2)}
+  .ev-item a:hover{color:var(--accent)}
+
+  .withdrawbtn{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
+
+  .empty{
+    text-align:center;padding:40px 20px;color:var(--muted);font-size:13.5px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .kbar{display:flex;gap:20px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:16px;letter-spacing:.06em}
+  .kbar span{display:flex;align-items:center;gap:6px}
+  .kbar b{color:var(--text);font-weight:700}
+
+  footer{
+    margin-top:80px;padding-top:22px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em;
+  }
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--accent)}
+  .note{font-size:11.5px;color:var(--muted-2);margin-top:10px;font-family:'JetBrains Mono',monospace}
+  .prog-summary{
+    background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:14px 16px;
+    margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 16px;
+  }
+  .prog-summary b{color:var(--text)}
+  @media(max-width:640px){.hero h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── NAV ────────────────────────────────────────────────── -->
+  <div class="nav">
+    <div class="brandline">
+      <img src="/logo.svg" alt="AegisWatch logo" />
+      <div>
+        <div class="name">AegisWatch</div>
+        <div class="tick">$ security-triage :: on-chain</div>
+      </div>
+    </div>
+    <div class="wallet-wrap">
+      <span class="netpill" id="netpill">GenLayer studionet</span>
+      <button class="connect" id="connectBtn">Connect Wallet</button>
+      <span class="addr" id="addrLabel"></span>
+    </div>
+  </div>
+
+  <!-- ── HERO ────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-eyebrow">// Decentralized bounty verifier</div>
+    <h1>Reports are triaged by an <em>on-chain AI Jury</em> that reads the evidence, assigns a severity tier, and settles the bounty — no maintainer, no arbiter in the middle.</h1>
+    <p>Sponsors fund a bounty pool with a HIGH / MEDIUM / LOW payout schedule. Researchers submit reports with public evidence URLs and a small anti-spam bond. Validators re-fetch every source, re-run the triage prompt, and only agree when the meaning of the verdict matches — not just its shape.</p>
+    <div class="sev-legend">
+      <span class="sev-chip high"><span class="dot"></span>HIGH</span>
+      <span class="sev-chip med"><span class="dot"></span>MEDIUM</span>
+      <span class="sev-chip low"><span class="dot"></span>LOW</span>
+      <span class="sev-chip deb"><span class="dot"></span>DEBUNKED · bond forfeited</span>
+      <span class="sev-chip ins"><span class="dot"></span>INSUFFICIENT_PROOF · bond returned</span>
+    </div>
+  </section>
+
+  <!-- ── TABS ────────────────────────────────────────────────── -->
+  <nav class="tabs">
+    <button class="active" data-tab="fund">01 · Fund Program</button>
+    <button data-tab="submit">02 · Submit Report</button>
+    <button data-tab="convene">03 · Convene Verifier</button>
+    <button data-tab="recent">04 · Recent Reports</button>
+  </nav>
+
+  <!-- ── TAB 1: Fund Program ─────────────────────────────────── -->
+  <div class="panel active" id="tab-fund">
+    <div class="card">
+      <h3>Create a Bounty Program</h3>
+      <p class="sub">Sponsor opens a scope, escrows the initial pool, and locks a per-tier payout schedule. Reporters cannot be paid more than the schedule allows.</p>
+
+      <label>Scope URL <span class="hint">public docs / bug-bounty policy page</span></label>
+      <input id="p_scope_url" placeholder="https://your-project.example/security" />
+
+      <label>Scope Summary <span class="hint">one line describing what is in scope</span></label>
+      <input id="p_scope_sum" placeholder="e.g. Smart contracts under /contracts and API endpoints under api.project.example" />
+
+      <div class="row">
+        <div>
+          <label>Initial Pool <span class="hint">wei sent with tx</span></label>
+          <input id="p_pool" type="number" min="1" placeholder="2000000" />
+        </div>
+        <div>
+          <label>Min Bond <span class="hint">reporter stake</span></label>
+          <input id="p_bond" type="number" min="0" placeholder="25000" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>HIGH Payout</label>
+          <input id="p_high" type="number" min="0" placeholder="800000" />
+        </div>
+        <div>
+          <label>MEDIUM Payout</label>
+          <input id="p_med" type="number" min="0" placeholder="300000" />
+        </div>
+        <div>
+          <label>LOW Payout</label>
+          <input id="p_low" type="number" min="0" placeholder="50000" />
+        </div>
+      </div>
+
+      <button class="act" id="p_btn">Escrow Pool &amp; Create Program</button>
+      <div class="status" id="p_status"></div>
+      <p class="note">// HIGH &gt;= MEDIUM &gt;= LOW · HIGH payout must fit inside the pool.</p>
+    </div>
+  </div>
+
+  <!-- ── TAB 2: Submit Report ────────────────────────────────── -->
+  <div class="panel" id="tab-submit">
+    <div class="card">
+      <h3>File a Bounty Report</h3>
+      <p class="sub">Attach a bond &ge; the program minimum. On any verified severity, your bond returns with the payout. On DEBUNKED, the bond is forfeited to the pool.</p>
+
+      <div class="row">
+        <div>
+          <label>Program ID</label>
+          <input id="r_pid" type="number" min="0" placeholder="0" />
+        </div>
+        <div>
+          <label>Bond <span class="hint">must meet program minimum</span></label>
+          <input id="r_bond" type="number" min="0" placeholder="25000" />
+        </div>
+      </div>
+
+      <label>Report Summary <span class="hint">what is the alleged issue</span></label>
+      <textarea id="r_summary" placeholder="e.g. Signature-replay in /api/withdraw allows draining funds; PoC lands in the linked disclosed PR."></textarea>
+
+      <label>Evidence URLs <span class="hint">one per line — advisory, PR, blog, on-chain trace, mirrored post</span></label>
+      <textarea id="r_urls" rows="4" placeholder="https://raw.githubusercontent.com/org/repo/main/advisories/GHSA-xxx.txt&#10;https://github.com/org/repo/pull/1234"></textarea>
+
+      <button class="act" id="r_btn">Stake Bond &amp; Submit Report</button>
+      <div class="status" id="r_status"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB 3: Convene Verifier ─────────────────────────────── -->
+  <div class="panel" id="tab-convene">
+    <div class="card">
+      <h3>Convene the AI Verifier</h3>
+      <p class="sub">Fires the on-chain nondet block: every validator fetches your evidence URLs, runs a security-triage prompt, and votes. Consensus lands when severity matches within one tier and injection flags agree. May take 1–3 minutes.</p>
+
+      <div class="row">
+        <div>
+          <label>Report ID</label>
+          <input id="v_id" type="number" min="0" placeholder="0" />
+        </div>
+      </div>
+      <button class="act" id="v_btn">Request AI Triage</button>
+      <div class="status" id="v_status"></div>
+      <p class="note">// Verdict returns: severity · payout · reason · injection_flag.</p>
+    </div>
+
+    <div class="card">
+      <h3>Lookup a Report</h3>
+      <p class="sub">Read the current state and verdict directly from the contract.</p>
+      <div class="row">
+        <div>
+          <label>Report ID</label>
+          <input id="l_id" type="number" min="0" placeholder="0" />
+        </div>
+      </div>
+      <button class="act ghost" id="l_btn">Fetch Verdict</button>
+      <div class="status" id="l_status"></div>
+      <div id="l_result"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB 4: Recent Reports (public read) ─────────────────── -->
+  <div class="panel" id="tab-recent">
+    <div class="card">
+      <h3>Recent Reports</h3>
+      <p class="sub">Every report filed on this contract, newest first. No wallet needed — this reads through a public read-only client.</p>
+      <div class="kbar" id="kbar">
+        <span>Contract: <b class="mono" id="contractLabel">…</b></span>
+        <span>Programs: <b id="k_progs">…</b></span>
+        <span>Reports: <b id="k_reports">…</b></span>
+      </div>
+      <button class="act ghost" id="rc_btn">Refresh</button>
+      <div class="status" id="rc_status"></div>
+      <div id="rc_list" class="rlist"></div>
+    </div>
+  </div>
+
+  <footer>
+    <span>AegisWatch · Intelligent Contract on GenLayer (studionet)</span>
+    <span><a href="https://explorer-studio.genlayer.com" target="_blank" rel="noopener">Explorer</a> · <a href="https://studio.genlayer.com" target="_blank" rel="noopener">Studio</a> · <a href="https://docs.genlayer.com" target="_blank" rel="noopener">Docs</a></span>
+  </footer>
+</div>
+
+<script type="module">
+import { createClient } from "genlayer-js";
+import { localnet, studionet } from "genlayer-js/chains";
+import { CONTRACT_ADDRESS, CHAIN } from "./src/config.js";
+
+// ── CONFIG ────────────────────────────────────────────────────────
+const chain = CHAIN === "studio" ? studionet : localnet;
+const CHAIN_ID_HEX = "0x" + chain.id.toString(16);
+const RPC_URL = chain.rpcUrls?.default?.http?.[0] || "https://studio.genlayer.com/api";
+let account = null;
+let client = null;
+const readOnlyClient = createClient({ chain });
+
+const $ = (id) => document.getElementById(id);
+document.getElementById("contractLabel").textContent =
+  CONTRACT_ADDRESS && CONTRACT_ADDRESS !== "TO_BE_FILLED_AFTER_DEPLOY"
+    ? CONTRACT_ADDRESS.slice(0,8) + "…" + CONTRACT_ADDRESS.slice(-6)
+    : "not configured";
+
+function setStatus(el, kind, msg, spinning=false){
+  el.className = "status show " + kind;
+  el.innerHTML = (spinning ? '<span class="spin"></span>' : '') + '<span>'+msg+'</span>';
+}
+function clearStatus(el){ el.className = "status"; }
+
+async function ensureNetwork(){
+  if (!window.ethereum) return;
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: CHAIN_ID_HEX }],
+    });
+  } catch (err) {
+    if (err.code === 4902 || err.code === -32603) {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: CHAIN_ID_HEX,
+          chainName: "GenLayer Studio Network",
+          nativeCurrency: { name: "GEN Token", symbol: "GEN", decimals: 18 },
+          rpcUrls: [RPC_URL],
+          blockExplorerUrls: ["https://explorer-studio.genlayer.com"],
+        }],
+      });
+    } else {
+      throw err;
+    }
+  }
+}
+
+// ── Wallet ────────────────────────────────────────────────────────
+$("connectBtn").addEventListener("click", async () => {
+  try {
+    if (!window.ethereum) {
+      $("addrLabel").textContent = "MetaMask required";
+      return;
+    }
+    await ensureNetwork();
+    const [addr] = await window.ethereum.request({ method: "eth_requestAccounts" });
+    account = addr;
+    client = createClient({ chain, account: addr });
+    $("addrLabel").textContent = addr.slice(0,6) + "…" + addr.slice(-4);
+    $("connectBtn").textContent = "Connected";
+    $("connectBtn").disabled = true;
+  } catch (e) {
+    $("addrLabel").textContent = "Wallet connection error";
+    console.error(e);
+  }
+});
+
+function ensureReady(statusEl){
+  if (!client || !account){ setStatus(statusEl,"err","Please connect your wallet first."); return false; }
+  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "TO_BE_FILLED_AFTER_DEPLOY"){
+    setStatus(statusEl,"err","Contract address is not configured in src/config.js.");
+    return false;
+  }
+  return true;
+}
+
+async function writeTx(method, args, value, statusEl, msg){
+  setStatus(statusEl,"work", msg || "Sending transaction · waiting for consensus…", true);
+  const txHash = await client.writeContract({
+    address: CONTRACT_ADDRESS, functionName: method, args,
+    value: value ? BigInt(value) : 0n,
+  });
+  await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
+  return txHash;
+}
+
+async function readContract(method, args){
+  return readOnlyClient.readContract({ address: CONTRACT_ADDRESS, functionName: method, args });
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    $("tab-"+b.dataset.tab).classList.add("active");
+    if (b.dataset.tab === "recent") loadRecent();
+  });
+});
+
+// ── 1. Fund program ──────────────────────────────────────────────
+$("p_btn").addEventListener("click", async ()=>{
+  const el=$("p_status"); if(!ensureReady(el))return;
+  try{
+    const scope_url = $("p_scope_url").value.trim();
+    const scope_sum = $("p_scope_sum").value.trim();
+    const pool = $("p_pool").value.trim();
+    const bond = $("p_bond").value.trim() || "0";
+    const high = $("p_high").value.trim();
+    const med = $("p_med").value.trim();
+    const low = $("p_low").value.trim();
+    if (!scope_url || !pool || !high || !med || !low){
+      setStatus(el,"err","Fill scope URL, pool, and all three payouts.");
+      return;
+    }
+    await writeTx("create_program",
+      [scope_url, scope_sum, Number(high), Number(med), Number(low), Number(bond)],
+      pool, el, "Escrowing pool · opening program…");
+    const totals = JSON.parse(await readContract("get_totals", []));
+    const pid = Math.max(totals.programs - 1, 0);
+    setStatus(el,"ok","Program #"+pid+" opened. Pool escrowed for HIGH/MEDIUM/LOW payouts.");
+  }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
+});
+
+// ── 2. Submit report ─────────────────────────────────────────────
+$("r_btn").addEventListener("click", async ()=>{
+  const el=$("r_status"); if(!ensureReady(el))return;
+  try{
+    const pid = $("r_pid").value.trim();
+    const bond = $("r_bond").value.trim();
+    const summary = $("r_summary").value.trim();
+    const urls = $("r_urls").value.trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    if (pid==="" || !bond || !summary || urls.length===0){
+      setStatus(el,"err","Fill program id, bond, summary, and at least one evidence URL.");
+      return;
+    }
+    const evidence = JSON.stringify(urls.map(u => ({ url: u, note: "" })));
+    await writeTx("submit_report",
+      [Number(pid), summary, evidence], bond, el,
+      "Staking bond · registering report…");
+    const totals = JSON.parse(await readContract("get_totals", []));
+    const rid = Math.max(totals.reports - 1, 0);
+    setStatus(el,"ok","Report #"+rid+" filed against program #"+pid+". Convene the verifier in the next tab.");
+    $("v_id").value = String(rid);
+    $("l_id").value = String(rid);
+  }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
+});
+
+// ── 3. Convene verifier ──────────────────────────────────────────
+$("v_btn").addEventListener("click", async ()=>{
+  const el=$("v_status"); if(!ensureReady(el))return;
+  try{
+    const id = $("v_id").value.trim();
+    if (id===""){ setStatus(el,"err","Report ID required."); return; }
+    setStatus(el,"work","AI validators fetching evidence · running triage · reaching consensus. This can take 1–3 minutes.", true);
+    const txHash = await client.writeContract({
+      address: CONTRACT_ADDRESS, functionName: "convene_verifier",
+      args: [Number(id)], value: 0n,
+    });
+    await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
+    setStatus(el,"ok","AI Verifier finalized report #"+id+". Fetch the verdict below.");
+    $("l_id").value = String(id);
+    $("l_btn").click();
+  }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
+});
+
+// ── Lookup report & render verdict ───────────────────────────────
+const STATUS_LABEL = {
+  REPORT_PENDING: {t:"Pending", cls:"pending"},
+  REPORT_VERIFIED_HIGH: {t:"Verified · HIGH", cls:"high"},
+  REPORT_VERIFIED_MEDIUM: {t:"Verified · MEDIUM", cls:"medium"},
+  REPORT_VERIFIED_LOW: {t:"Verified · LOW", cls:"low"},
+  REPORT_DEBUNKED: {t:"Debunked", cls:"debunked"},
+  REPORT_INSUFFICIENT_PROOF: {t:"Insufficient Proof", cls:"insuff"},
+  REPORT_WITHDRAWN: {t:"Withdrawn", cls:"withdrawn"},
+};
+
+$("l_btn").addEventListener("click", async ()=>{
+  const el=$("l_status"), out=$("l_result");
+  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "TO_BE_FILLED_AFTER_DEPLOY"){
+    setStatus(el,"err","Contract address is not configured."); return;
+  }
+  try{
+    const id=$("l_id").value.trim(); if (id===""){ setStatus(el,"err","Report ID required."); return; }
+    setStatus(el,"work","Reading report state from contract…", true);
+    const raw = await readContract("get_report",[Number(id)]);
+    const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+    let prog = null;
+    try { prog = JSON.parse(await readContract("get_program",[Number(d.program_id)])); }
+    catch(_){}
+    clearStatus(el);
+    out.innerHTML = renderReport(id, d, prog);
+    out.scrollIntoView({behavior:"smooth", block:"start"});
+  }catch(e){ setStatus(el,"err","Report not found or error: "+(e.message||e)); out.innerHTML=""; console.error(e);}
+});
+
+function renderReport(id, d, prog){
+  const st = STATUS_LABEL[d.status] || { t: d.status, cls: "pending" };
+  const badgeHtml = `<span class="badge ${st.cls}">${escapeHtml(st.t)}</span>`;
+
+  const progHtml = prog ? `
+    <div class="prog-summary">
+      <div>Program <b>#${prog.id}</b></div>
+      <div>Sponsor <b>${shortAddr(prog.sponsor)}</b></div>
+      <div>Pool balance <b>${prog.pool_balance}</b></div>
+      <div>HIGH / MED / LOW <b>${prog.high_payout} · ${prog.medium_payout} · ${prog.low_payout}</b></div>
+      <div>Scope <b><a href="${prog.scope_url}" target="_blank" rel="noopener">${escapeHtml(shortUrl(prog.scope_url))}</a></b></div>
+    </div>` : "";
+
+  const isVerified = d.status.startsWith("REPORT_VERIFIED_");
+  const payoutBlock = `
+    <div class="payout-row">
+      <div><span>Severity</span><span>${escapeHtml(d.severity || "—")}</span></div>
+      <div><span>Payout</span><span>${d.payout_amount}</span></div>
+      <div><span>Bond</span><span>${d.bond}</span></div>
+      <div><span>Withdrawable</span><span>${d.withdrawable}</span></div>
+      <div><span>Reporter</span><span>${shortAddr(d.reporter)}</span></div>
+    </div>`;
+
+  const reasonBlock = d.reason ? `
+    <div class="reason">
+      <div class="rl">AI Verifier Rationale</div>
+      ${escapeHtml(d.reason)}
+    </div>` : "";
+
+  const injBlock = d.injection_flag ? `
+    <div class="injection">Prompt-injection detected in evidence · downgraded to INSUFFICIENT_PROOF</div>` : "";
+
+  const evBlock = `
+    <div class="ev">
+      <div style="color:var(--muted-2);letter-spacing:.1em">// EVIDENCE</div>
+      ${(d.evidence || []).map(e =>
+        `<div class="ev-item">→ <a href="${e.url}" target="_blank" rel="noopener">${escapeHtml(shortUrl(e.url))}</a>${e.note ? ' · <span style="color:var(--muted-2)">'+escapeHtml(e.note)+'</span>' : ''}</div>`
+      ).join("") || '<div class="ev-item">— none —</div>'}
+    </div>`;
+
+  const canWithdraw = d.withdrawable > 0 && d.status !== "REPORT_WITHDRAWN";
+  const wdBlock = canWithdraw ? `
+    <div class="withdrawbtn">
+      <button class="act" data-wd="${id}">Withdraw ${d.withdrawable}</button>
+      <span class="mono" id="wd_status_${id}"></span>
+    </div>` : "";
+
+  return `<div class="verdict">
+    <div class="vhead">
+      <span class="id">REPORT <b>#${id}</b> · program <b>#${d.program_id}</b></span>
+      ${badgeHtml}
+    </div>
+    <div class="vbody">
+      ${progHtml}
+      <div class="mono" style="color:var(--muted);font-size:12.5px;margin-bottom:12px">"${escapeHtml(d.summary)}"</div>
+      ${payoutBlock}
+      ${reasonBlock}
+      ${injBlock}
+      ${evBlock}
+      ${wdBlock}
+    </div>
+  </div>`;
+}
+
+document.addEventListener("click", async (ev)=>{
+  const btn = ev.target.closest("[data-wd]");
+  if (!btn) return;
+  const id = btn.dataset.wd;
+  const st = document.getElementById("wd_status_"+id);
+  if (!client || !account){ if (st) st.textContent="Connect wallet first."; return; }
+  try {
+    if (st) st.textContent = "Withdrawing…";
+    const txHash = await client.writeContract({
+      address: CONTRACT_ADDRESS, functionName: "withdraw_report",
+      args: [Number(id)], value: 0n,
+    });
+    await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
+    if (st) st.textContent = "Withdrawn.";
+    $("l_id").value = id; $("l_btn").click();
+  } catch(e){ if (st) st.textContent = "Error: "+(e.message||e); console.error(e);}
+});
+
+// ── Recent list ──────────────────────────────────────────────────
+async function loadRecent(){
+  const el=$("rc_status"), list=$("rc_list");
+  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "TO_BE_FILLED_AFTER_DEPLOY"){
+    setStatus(el,"err","Contract address is not configured."); return;
+  }
+  try {
+    setStatus(el,"work","Reading recent reports from the contract…", true);
+    const totalsRaw = await readContract("get_totals", []);
+    const totals = typeof totalsRaw === "string" ? JSON.parse(totalsRaw) : totalsRaw;
+    $("k_progs").textContent = totals.programs;
+    $("k_reports").textContent = totals.reports;
+
+    if (totals.reports === 0){
+      clearStatus(el);
+      list.innerHTML = '<p class="empty">No reports on this contract yet. Fund a program, then submit one.</p>';
+      return;
+    }
+    const ids = [];
+    for (let i = totals.reports - 1; i >= Math.max(0, totals.reports - 12); i--) ids.push(i);
+    const rows = await Promise.all(ids.map(async i => {
+      try {
+        const raw = await readContract("get_report",[i]);
+        const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+        return { id: i, d };
+      } catch(e){ return { id: i, err: e.message || String(e) }; }
+    }));
+    clearStatus(el);
+    list.innerHTML = rows.map(r => {
+      if (r.err) return `<div class="rrow"><div class="head"><span class="idlabel">REPORT <b>#${r.id}</b></span><span class="badge withdrawn">error</span></div><div class="reason">${escapeHtml(r.err).slice(0,120)}</div></div>`;
+      const d = r.d;
+      const st = STATUS_LABEL[d.status] || { t: d.status, cls: "pending" };
+      const short = d.summary ? d.summary.slice(0, 140) + (d.summary.length > 140 ? "…" : "") : "";
+      const reasonShort = d.reason ? d.reason.slice(0, 200) + (d.reason.length > 200 ? "…" : "") : "";
+      return `<div class="rrow" data-open="${r.id}">
+        <div class="head">
+          <span class="idlabel">REPORT <b>#${r.id}</b> · program <b>#${d.program_id}</b> · bond <b>${d.bond}</b>${d.payout_amount ? ' · payout <b>'+d.payout_amount+'</b>' : ''}</span>
+          <span class="badge ${st.cls}">${escapeHtml(st.t)}</span>
+        </div>
+        <div class="reason">${escapeHtml(short)}</div>
+        ${reasonShort ? `<div class="reason" style="color:var(--muted-2);font-family:'JetBrains Mono',monospace;font-size:11.5px">// ${escapeHtml(reasonShort)}</div>` : ""}
+      </div>`;
+    }).join("");
+    // Click rows to open verdict in the Convene tab
+    list.querySelectorAll("[data-open]").forEach(r => {
+      r.addEventListener("click", () => {
+        document.querySelector('nav.tabs button[data-tab="convene"]').click();
+        $("l_id").value = r.dataset.open;
+        $("l_btn").click();
+      });
+    });
+  } catch(e){ setStatus(el,"err","Error loading list: "+(e.message||e)); console.error(e);}
+}
+$("rc_btn").addEventListener("click", loadRecent);
+
+// Auto-load Recent Reports on first render so a wallet-less visitor sees something.
+loadRecent().catch(()=>{});
+
+function shortUrl(u){ try { const x = new URL(u); return x.hostname + (x.pathname.length > 16 ? x.pathname.slice(0, 16) + "…" : x.pathname); } catch { return String(u).slice(0, 32); } }
+function shortAddr(a){ return a ? a.slice(0, 6) + "…" + a.slice(-4) : "—"; }
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+</script>
+</body>
+</html>
