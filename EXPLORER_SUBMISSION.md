@@ -76,7 +76,7 @@ Go to **Convene Verifier** (the Report ID is already prefilled). Click **Request
 Recent Reports shows three RESOLVED reports on Program 0 with distinct tiers: one HIGH_VERIFIED with payout 800000, one MEDIUM_VERIFIED with payout 300000, one DEBUNKED with bond forfeited to the pool. Each has a plain-English reason citing specific evidence sources - proof validators fetched the URLs and triaged them on-chain, not hardcoded. Explorer address page shows convene_verifier transactions with GENVM RESULT: SUCCESS and CONSENSUS RESULT: Accepted.
 
 ## Contract link
-`https://explorer-studio.genlayer.com/address/<contract>`
+`https://explorer-studio.genlayer.com/address/0x10781FE67637d391Faa5Ad63AF4fE41e0261304b`
 
 - **Address:** `0x10781FE67637d391Faa5Ad63AF4fE41e0261304b`
 - **Network:** studionet (GenLayer Studio hosted)
