@@ -2,7 +2,7 @@
 
 > An **Intelligent Contract** on GenLayer that turns every bounty report into an on-chain AI Verifier verdict. Sponsors fund a bounty pool with a HIGH / MEDIUM / LOW payout schedule; reporters attach public evidence URLs and stake an anti-spam bond; validators fetch the evidence directly on-chain, run a security-triage prompt, and settle the payout.
 
-- **Live app:** https://aegis-watch.vercel.app
+- **Live app:** https://aegis-watch-app.vercel.app
 - **Network:** **GenLayer Studio Network (studionet)**
 - **Explorer:** https://explorer-studio.genlayer.com
 
