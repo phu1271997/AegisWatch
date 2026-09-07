@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12161c"/>
+      <stop offset="1" stop-color="#0a0d11"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#7ff2dc"/>
+      <stop offset="0.55" stop-color="#5eead4"/>
+      <stop offset="1" stop-color="#2fa38f"/>
+    </linearGradient>
+    <linearGradient id="alert" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7a94"/>
+      <stop offset="1" stop-color="#ff4d6d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.36" r="0.65">
+      <stop offset="0" stop-color="#5eead4" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#5eead4" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="shieldClip">
+      <path d="M256 68 L416 122 V264 C416 350 350 410 256 448 C162 410 96 350 96 264 V122 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Rounded ground -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="url(#glow)"/>
+
+  <!-- Faint monitor grid inside shield -->
+  <g clip-path="url(#shieldClip)" stroke="#25313f" stroke-width="1.2" opacity="0.9">
+    <path d="M96 170 H416 M96 210 H416 M96 250 H416 M96 290 H416 M96 330 H416 M96 370 H416 M96 410 H416"/>
+    <path d="M140 122 V448 M186 122 V448 M232 122 V448 M280 122 V448 M326 122 V448 M372 122 V448"/>
+  </g>
+
+  <!-- Shield frame -->
+  <path d="M256 68 L416 122 V264 C416 350 350 410 256 448 C162 410 96 350 96 264 V122 Z"
+        fill="none" stroke="url(#mark)" stroke-width="18" stroke-linejoin="round"/>
+
+  <!-- Magnifier lens (forensic loupe) inside shield -->
+  <g clip-path="url(#shieldClip)">
+    <circle cx="230" cy="234" r="82" fill="none" stroke="url(#mark)" stroke-width="16"/>
+    <!-- Inner tick marks around lens rim -->
+    <g stroke="url(#mark)" stroke-width="4" opacity="0.55">
+      <path d="M230 148 v-14 M230 334 v14 M144 234 h-14 M316 234 h14"/>
+      <path d="M170 174 l-10 -10 M290 174 l10 -10 M170 294 l-10 10 M290 294 l10 10"/>
+    </g>
+    <!-- Handle -->
+    <path d="M292 296 L360 364" stroke="url(#mark)" stroke-width="22" stroke-linecap="round"/>
+    <!-- Handle grip stripes -->
+    <path d="M320 324 L340 344 M328 316 L348 336 M312 332 L332 352"
+          stroke="#0a0d11" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Alert chevron / caret inside lens: signals detected anomaly -->
+    <path d="M198 260 L230 210 L262 260" fill="none"
+          stroke="url(#alert)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="230" cy="278" r="7" fill="url(#alert)"/>
+  </g>
+</svg>
