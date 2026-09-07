@@ -12,280 +12,785 @@
 <meta property="og:image" content="/logo-1024.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* ─────────────────────────────────────────────────────────────
+     DESIGN TOKENS — cyber-forensic incident-response palette
+     ───────────────────────────────────────────────────────────── */
   :root{
-    /* Palette: cyber-forensic incident response */
-    --bg:#0b0d10;
-    --bg-2:#12161c;
-    --panel:#161b22;
-    --panel-2:#1c222b;
+    /* Backgrounds */
+    --bg:#0a0c10;
+    --bg-2:#0f1218;
+    --surface:#141922;
+    --surface-2:#1a212c;
+    --surface-3:#212a37;
+
+    /* Lines */
     --line:#242c37;
     --line-2:#2f3946;
-    --text:#dae2ee;
-    --muted:#7a8798;
-    --muted-2:#586573;
-    --scan:#1a2029;
+    --line-3:#3a475a;
 
-    --sev-high:#ff4d6d;      /* HIGH — critical red */
-    --sev-medium:#ffb84d;    /* MEDIUM — amber */
-    --sev-low:#ffea7f;       /* LOW — yellow */
-    --sev-debunked:#7a8798;  /* DEBUNKED — gray */
-    --sev-insuff:#6f7fb3;    /* INSUFFICIENT — muted blue */
-    --sev-pending:#5eead4;   /* PENDING — teal */
-    --accent:#5eead4;        /* terminal cursor / active */
+    /* Text */
+    --text:#e6ecf5;
+    --text-2:#dae2ee;
+    --muted:#8592a4;
+    --muted-2:#5c6a7c;
+    --muted-3:#42505f;
+
+    /* Accents */
+    --accent:#5eead4;        /* primary — terminal cursor */
     --accent-2:#3ec6b0;
+    --accent-glow:rgba(94,234,212,.35);
+
+    /* Severity palette */
+    --sev-high:#ff4d6d;
+    --sev-high-bg:rgba(255,77,109,.09);
+    --sev-medium:#ffb84d;
+    --sev-medium-bg:rgba(255,184,77,.09);
+    --sev-low:#ffea7f;
+    --sev-low-bg:rgba(255,234,127,.09);
+    --sev-debunked:#7a8798;
+    --sev-debunked-bg:rgba(122,135,152,.10);
+    --sev-insuff:#8ea3d4;
+    --sev-insuff-bg:rgba(142,163,212,.09);
+    --sev-pending:#5eead4;
+    --sev-pending-bg:rgba(94,234,212,.09);
+    --sev-withdrawn:#586573;
+
+    /* Semantic */
     --danger:#ff4d6d;
+    --warn:#ffb84d;
     --ok:#4ade80;
+
+    /* Typography */
+    --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+    /* Radii */
+    --r-xs:3px;
+    --r-sm:5px;
+    --r-md:8px;
+    --r-lg:12px;
+    --r-pill:999px;
+
+    /* Spacing scale */
+    --s-1:4px;
+    --s-2:8px;
+    --s-3:12px;
+    --s-4:16px;
+    --s-5:20px;
+    --s-6:24px;
+    --s-7:32px;
+    --s-8:40px;
+    --s-9:56px;
+
+    /* Shadows */
+    --shadow-1:0 1px 2px rgba(0,0,0,.35);
+    --shadow-2:0 4px 20px rgba(0,0,0,.45);
+    --shadow-glow:0 0 0 1px var(--accent-glow),0 6px 30px rgba(94,234,212,.15);
+
+    /* Motion */
+    --ease:cubic-bezier(.4,.2,.2,1);
+    --dur-1:.12s;
+    --dur-2:.22s;
   }
+
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.55;min-height:100vh}
+  html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.55;min-height:100vh}
   body{
     background-image:
-      radial-gradient(circle at 12% -5%, rgba(94,234,212,.08), transparent 40%),
-      radial-gradient(circle at 92% 10%, rgba(255,77,109,.06), transparent 45%),
-      linear-gradient(180deg, #0b0d10 0%, #0a0c10 100%);
+      radial-gradient(ellipse at 12% -5%, rgba(94,234,212,.09), transparent 45%),
+      radial-gradient(ellipse at 92% 8%, rgba(255,77,109,.06), transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(94,234,212,.04), transparent 55%),
+      linear-gradient(180deg, #0a0c10 0%, #08090d 100%);
     background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
   }
-  a{color:var(--accent-2)}
-  .wrap{max-width:1120px;margin:0 auto;padding:0 22px 100px}
-  .mono{font-family:'JetBrains Mono',monospace}
+  a{color:var(--accent-2);text-decoration:none;transition:color var(--dur-1) var(--ease)}
+  a:hover{color:var(--accent)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 var(--s-6) var(--s-9)}
+  .mono{font-family:var(--font-mono)}
 
-  /* ── Top navbar ─────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     TOP NAVBAR
+     ───────────────────────────────────────────────────────────── */
   .nav{
-    display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
-    padding:22px 0 18px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:var(--s-5);flex-wrap:wrap;
+    padding:var(--s-6) 0 var(--s-5);border-bottom:1px solid var(--line);
   }
-  .brandline{display:flex;align-items:center;gap:14px}
-  .brandline img{width:44px;height:44px;border-radius:9px;flex-shrink:0}
-  .brandline .name{font-weight:700;font-size:19px;letter-spacing:.01em}
-  .brandline .tick{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase}
+  .brandline{display:flex;align-items:center;gap:var(--s-4)}
+  .brandline .logo-wrap{
+    position:relative;width:48px;height:48px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--surface-2),var(--surface));
+    border:1px solid var(--line-2);border-radius:var(--r-md);
+    box-shadow:var(--shadow-1);
+  }
+  .brandline .logo-wrap img{width:34px;height:34px;display:block}
+  .brandline .logo-wrap::after{
+    content:"";position:absolute;inset:-1px;border-radius:var(--r-md);pointer-events:none;
+    background:linear-gradient(135deg,rgba(94,234,212,.25),transparent 60%);opacity:.6;
+  }
+  .brandline .name{font-weight:700;font-size:20px;letter-spacing:-.005em;line-height:1}
+  .brandline .tick{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--muted);
+    letter-spacing:.18em;text-transform:uppercase;margin-top:5px;
+  }
+  .brandline .tick .cursor{
+    color:var(--accent);animation:blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0}}
+
+  .nav-actions{display:flex;align-items:center;gap:var(--s-3);flex-wrap:wrap}
+
+  .link-btn{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);background:none;border:1px solid var(--line-2);
+    padding:9px 14px;border-radius:var(--r-sm);cursor:pointer;
+    transition:all var(--dur-1) var(--ease);
+  }
+  .link-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(94,234,212,.06)}
 
   .netpill{
-    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
-    color:var(--accent);background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.25);
-    padding:6px 11px;border-radius:999px;text-transform:uppercase;
-    display:flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;
+    color:var(--accent);background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.28);
+    padding:7px 12px;border-radius:var(--r-pill);text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:8px;
   }
-  .netpill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  .netpill::before{
+    content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 8px var(--accent);animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
 
-  .wallet-wrap{display:flex;align-items:center;gap:12px}
+  .wallet-wrap{display:flex;align-items:center;gap:10px}
   .connect{
-    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
     background:var(--accent);color:#0a0f0d;border:none;padding:11px 18px;font-weight:700;
-    cursor:pointer;border-radius:6px;transition:background .15s;
+    cursor:pointer;border-radius:var(--r-sm);
+    transition:background var(--dur-1) var(--ease),transform .05s;
+    box-shadow:0 4px 14px rgba(94,234,212,.22);
   }
   .connect:hover{background:var(--accent-2)}
-  .connect:disabled{opacity:.6;cursor:not-allowed}
-  .addr{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .connect:active{transform:translateY(1px)}
+  .connect:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
+  .wallet-chip{
+    display:none;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:12px;color:var(--text);
+    background:var(--surface);border:1px solid var(--line-2);
+    padding:9px 12px;border-radius:var(--r-sm);
+  }
+  .wallet-chip.show{display:inline-flex}
+  .wallet-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+  .wallet-chip button{
+    background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 4px;
+    font-family:var(--font-mono);font-size:11px;
+  }
+  .wallet-chip button:hover{color:var(--accent)}
 
-  /* ── Hero / mission strip ───────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     HERO
+     ───────────────────────────────────────────────────────────── */
   .hero{
-    margin:26px 0 8px;padding:28px 28px 22px;
-    background:linear-gradient(135deg, rgba(20,25,32,.9) 0%, rgba(18,22,28,.9) 100%);
-    border:1px solid var(--line);border-radius:10px;position:relative;overflow:hidden;
+    margin:var(--s-6) 0 var(--s-3);padding:var(--s-7) var(--s-7) var(--s-6);
+    background:linear-gradient(135deg, rgba(20,25,32,.9) 0%, rgba(15,18,24,.9) 100%);
+    border:1px solid var(--line);border-radius:var(--r-md);position:relative;overflow:hidden;
   }
   .hero::before{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background:repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px);
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 3px);
+  }
+  .hero::after{
+    content:"";position:absolute;top:-40%;right:-10%;width:400px;height:400px;pointer-events:none;
+    background:radial-gradient(circle,rgba(94,234,212,.10),transparent 55%);
+    filter:blur(6px);
   }
   .hero-eyebrow{
-    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;
-    color:var(--sev-pending);text-transform:uppercase;margin-bottom:10px;
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.28em;
+    color:var(--sev-pending);text-transform:uppercase;margin-bottom:12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .hero-eyebrow::before{
+    content:"";width:22px;height:1px;background:var(--sev-pending);
   }
   .hero h1{
-    font-family:'Inter',sans-serif;font-weight:700;font-size:30px;line-height:1.15;letter-spacing:-.01em;
-    margin-bottom:10px;max-width:820px;
+    font-family:var(--font-sans);font-weight:700;font-size:32px;line-height:1.18;letter-spacing:-.015em;
+    margin-bottom:12px;max-width:880px;position:relative;
   }
-  .hero h1 em{color:var(--accent);font-style:normal}
-  .hero p{color:var(--muted);font-size:14.5px;max-width:760px}
+  .hero h1 em{color:var(--accent);font-style:normal;text-shadow:0 0 22px rgba(94,234,212,.35)}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:800px;position:relative}
 
-  /* Severity chip legend under hero */
   .sev-legend{
-    display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;
-    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s-5);position:relative;
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;
   }
   .sev-chip{
-    display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:3px;
+    display:inline-flex;align-items:center;gap:7px;padding:5px 10px 5px 9px;border-radius:var(--r-xs);
     background:var(--bg-2);border:1px solid var(--line-2);color:var(--muted);text-transform:uppercase;
   }
   .sev-chip .dot{width:8px;height:8px;border-radius:2px}
-  .sev-chip.high .dot{background:var(--sev-high)}
-  .sev-chip.med  .dot{background:var(--sev-medium)}
-  .sev-chip.low  .dot{background:var(--sev-low)}
+  .sev-chip.high .dot{background:var(--sev-high);box-shadow:0 0 8px rgba(255,77,109,.6)}
+  .sev-chip.med  .dot{background:var(--sev-medium);box-shadow:0 0 8px rgba(255,184,77,.6)}
+  .sev-chip.low  .dot{background:var(--sev-low);box-shadow:0 0 8px rgba(255,234,127,.5)}
   .sev-chip.deb  .dot{background:var(--sev-debunked)}
   .sev-chip.ins  .dot{background:var(--sev-insuff)}
 
-  /* ── Tabs ────────────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     STATS STRIP
+     ───────────────────────────────────────────────────────────── */
+  .stats{
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;
+    margin:var(--s-5) 0 var(--s-3);
+  }
+  .stat{
+    background:var(--surface);padding:var(--s-5) var(--s-6);
+    display:flex;flex-direction:column;gap:6px;position:relative;
+    transition:background var(--dur-2) var(--ease);
+  }
+  .stat:hover{background:var(--surface-2)}
+  .stat .label{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);display:flex;align-items:center;gap:6px;
+  }
+  .stat .label::before{content:"";width:5px;height:5px;border-radius:1px;background:var(--muted-3)}
+  .stat.total .label::before{background:var(--accent)}
+  .stat.verified .label::before{background:var(--sev-pending)}
+  .stat.debunked .label::before{background:var(--sev-debunked)}
+  .stat.locked   .label::before{background:var(--sev-medium)}
+  .stat.reports  .label::before{background:var(--sev-insuff)}
+  .stat .value{
+    font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.01em;
+    line-height:1.1;
+  }
+  .stat .sub{font-family:var(--font-mono);font-size:10.5px;color:var(--muted-2);letter-spacing:.06em}
+  .stat.locked .value{color:var(--sev-medium)}
+  .stat.verified .value{color:var(--sev-pending)}
+  .stat.debunked .value{color:var(--sev-debunked)}
+  .stat.loading .value{color:var(--muted-3)}
+  @media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:480px){.stats{grid-template-columns:1fr}}
+
+  /* ─────────────────────────────────────────────────────────────
+     TABS
+     ───────────────────────────────────────────────────────────── */
   nav.tabs{
-    display:flex;gap:0;margin:32px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;
+    display:flex;gap:0;margin:var(--s-7) 0 0;border-bottom:1px solid var(--line);overflow-x:auto;
   }
   nav.tabs button{
-    background:none;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;
+    background:none;border:none;cursor:pointer;font-family:var(--font-mono);
     font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
     padding:14px 18px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;
+    transition:color var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease);
+    position:relative;
   }
   nav.tabs button:hover{color:var(--text)}
   nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+  nav.tabs button .tabnum{color:var(--muted-3);margin-right:4px;font-weight:400}
+  nav.tabs button.active .tabnum{color:var(--accent-2)}
 
-  .panel{display:none;padding:28px 0}
-  .panel.active{display:block}
+  .panel{display:none;padding:var(--s-6) 0}
+  .panel.active{display:block;animation:fadeIn .2s var(--ease)}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-  /* ── Card / form ─────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     CARDS + FORMS
+     ───────────────────────────────────────────────────────────── */
   .card{
-    background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:26px;margin-bottom:18px;
-    position:relative;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:var(--s-6) var(--s-6) var(--s-7);margin-bottom:var(--s-4);
+    position:relative;transition:border-color var(--dur-2) var(--ease);
+  }
+  .card:hover{border-color:var(--line-2)}
+  .card-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s-4);flex-wrap:wrap;
+    margin-bottom:var(--s-2);
   }
   .card h3{
-    font-family:'Inter',sans-serif;font-weight:600;font-size:16px;
-    display:flex;align-items:center;gap:10px;margin-bottom:4px;
+    font-family:var(--font-sans);font-weight:600;font-size:17px;letter-spacing:-.005em;
+    display:flex;align-items:center;gap:10px;
   }
   .card h3::before{
-    content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);box-shadow:0 0 8px rgba(94,234,212,.5);
+    content:"";width:9px;height:9px;border-radius:2px;background:var(--accent);
+    box-shadow:0 0 10px rgba(94,234,212,.6);flex-shrink:0;
   }
-  .card .sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+  .card .sub{font-size:13.5px;color:var(--muted);margin:6px 0 var(--s-5);max-width:640px}
+
+  .card-est{
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
+    text-align:right;letter-spacing:.05em;
+  }
+  .card-est b{color:var(--text);font-weight:600}
+  .card-est.warn{color:var(--warn)}
 
   label{
-    display:block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--muted);margin:16px 0 6px;
+    display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;
+    font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    margin:var(--s-4) 0 6px;
   }
   label .hint{color:var(--muted-2);font-weight:400;text-transform:none;letter-spacing:.02em;margin-left:6px}
+  label .req{color:var(--sev-high);margin-left:2px}
 
   input, textarea, select{
-    width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);
-    background:var(--bg-2);border:1px solid var(--line-2);border-radius:5px;padding:11px 12px;
-    transition:border-color .15s,box-shadow .15s;
+    width:100%;font-family:var(--font-mono);font-size:13px;color:var(--text);
+    background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:11px 12px;
+    transition:border-color var(--dur-1) var(--ease),box-shadow var(--dur-1) var(--ease),background var(--dur-1) var(--ease);
   }
+  input:hover, textarea:hover, select:hover{border-color:var(--line-3)}
   input:focus, textarea:focus, select:focus{
-    outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,234,212,.15);
+    outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(94,234,212,.15);background:var(--surface);
   }
-  textarea{resize:vertical;min-height:78px;font-size:12.5px}
-  .row{display:flex;gap:14px;flex-wrap:wrap}
+  input.invalid, textarea.invalid{
+    border-color:var(--danger);
+    box-shadow:0 0 0 3px rgba(255,77,109,.12);
+  }
+  textarea{resize:vertical;min-height:86px;font-size:12.5px;line-height:1.6}
+  .row{display:flex;gap:var(--s-4);flex-wrap:wrap}
   .row>div{flex:1;min-width:180px}
+  .field-error{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--danger);
+    letter-spacing:.04em;margin-top:5px;display:none;
+  }
+  .field-error.show{display:block}
+
+  /* Payout schedule sub-card inside the fund form */
+  .schedule{
+    margin-top:var(--s-4);padding:var(--s-4) var(--s-5);
+    background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);
+  }
+  .schedule .schead{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:var(--s-3);display:flex;justify-content:space-between;align-items:center;
+  }
 
   button.act{
-    margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;
+    margin-top:var(--s-6);font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;
     text-transform:uppercase;font-weight:700;background:var(--accent);color:#0a0f0d;
-    border:none;padding:13px 26px;cursor:pointer;border-radius:5px;transition:background .15s,transform .05s;
+    border:none;padding:13px 26px;cursor:pointer;border-radius:var(--r-sm);
+    transition:background var(--dur-1) var(--ease),transform .05s,box-shadow var(--dur-1);
+    display:inline-flex;align-items:center;gap:9px;
+    box-shadow:0 4px 14px rgba(94,234,212,.18);
   }
-  button.act:hover{background:var(--accent-2)}
+  button.act:hover{background:var(--accent-2);box-shadow:0 6px 20px rgba(94,234,212,.28)}
   button.act:active{transform:translateY(1px)}
-  button.act:disabled{background:var(--line-2);color:var(--muted);cursor:not-allowed}
-  button.ghost{
-    background:transparent;border:1px solid var(--line-2);color:var(--text);
+  button.act:disabled{background:var(--surface-3);color:var(--muted-2);cursor:not-allowed;box-shadow:none}
+  button.act.ghost{
+    background:transparent;border:1px solid var(--line-2);color:var(--text);box-shadow:none;
   }
-  button.ghost:hover{border-color:var(--accent);color:var(--accent);background:transparent}
+  button.act.ghost:hover{border-color:var(--accent);color:var(--accent);background:rgba(94,234,212,.05);box-shadow:none}
+  .actrow{display:flex;align-items:center;gap:var(--s-4);flex-wrap:wrap;margin-top:var(--s-6)}
+  .actrow button.act{margin-top:0}
 
-  /* ── Status pill ─────────────────────────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     STATUS PILL (kept for lookup panels)
+     ───────────────────────────────────────────────────────────── */
   .status{
     display:none;align-items:center;gap:10px;
-    font-family:'JetBrains Mono',monospace;font-size:12px;
-    margin-top:16px;padding:10px 14px;border-radius:5px;border:1px solid transparent;
+    font-family:var(--font-mono);font-size:12px;
+    margin-top:var(--s-4);padding:10px 14px;border-radius:var(--r-sm);border:1px solid transparent;
   }
   .status.show{display:flex}
   .status.work{background:rgba(94,234,212,.08);color:var(--accent);border-color:rgba(94,234,212,.25)}
   .status.ok{background:rgba(74,222,128,.08);color:var(--ok);border-color:rgba(74,222,128,.25)}
   .status.err{background:rgba(255,77,109,.08);color:var(--danger);border-color:rgba(255,77,109,.25)}
-  .spin{width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;flex-shrink:0}
+  .spin{
+    width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;
+    border-radius:50%;animation:s .8s linear infinite;flex-shrink:0;
+  }
   @keyframes s{to{transform:rotate(360deg)}}
 
-  /* ── Report card in Recent list ──────────────────────────────── */
-  .rlist{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-  .rrow{
-    background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:14px 16px;
-    cursor:pointer;transition:border-color .15s,transform .05s;
-    display:flex;flex-direction:column;gap:8px;
+  /* ─────────────────────────────────────────────────────────────
+     RECENT REPORTS: FILTERS + CARDS
+     ───────────────────────────────────────────────────────────── */
+  .filterbar{
+    display:flex;gap:var(--s-3);flex-wrap:wrap;align-items:center;margin:var(--s-4) 0 var(--s-3);
+    padding:var(--s-3) var(--s-4);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);
   }
-  .rrow:hover{border-color:var(--accent);transform:translateY(-1px)}
-  .rrow .head{
-    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  .filterbar label{margin:0;font-size:10.5px}
+  .filterbar select{
+    width:auto;min-width:130px;padding:7px 10px;font-size:12px;
+    background:var(--surface);border-color:var(--line-2);
   }
-  .rrow .idlabel{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
-  .rrow .idlabel b{color:var(--text)}
-  .rrow .reason{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .filterbar .search{flex:1;min-width:200px}
+  .filterbar .search input{padding:7px 10px;font-size:12px;background:var(--surface)}
+  .filterbar .spacer{flex:1;min-width:20px}
 
+  .rlist{display:flex;flex-direction:column;gap:var(--s-3);margin-top:var(--s-4)}
+  .rrow{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:var(--s-5) var(--s-5) var(--s-4);cursor:pointer;position:relative;
+    transition:border-color var(--dur-1) var(--ease),transform var(--dur-1) var(--ease),background var(--dur-1);
+    display:flex;flex-direction:column;gap:var(--s-3);
+  }
+  .rrow:hover{border-color:var(--line-3);transform:translateY(-1px);background:var(--surface)}
+  .rrow.high{border-left:3px solid var(--sev-high)}
+  .rrow.medium{border-left:3px solid var(--sev-medium)}
+  .rrow.low{border-left:3px solid var(--sev-low)}
+  .rrow.debunked{border-left:3px solid var(--sev-debunked);opacity:.85}
+  .rrow.insuff{border-left:3px solid var(--sev-insuff)}
+  .rrow.pending{border-left:3px solid var(--sev-pending)}
+  .rrow.withdrawn{border-left:3px solid var(--muted-3);opacity:.7}
+
+  .rrow .head{
+    display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);flex-wrap:wrap;
+  }
+  .rrow .idblock{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .rrow .idline{
+    font-family:var(--font-mono);font-size:12.5px;color:var(--text);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .rrow .idline .rid{color:var(--accent);font-weight:700}
+  .rrow .idline .pid{color:var(--muted)}
+  .rrow .metaline{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--muted-2);letter-spacing:.06em;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .rrow .metaline .k{color:var(--muted-3)}
+  .rrow .metaline .v{color:var(--muted)}
+  .rrow .summary{
+    font-family:var(--font-sans);font-size:13.5px;color:var(--text-2);line-height:1.55;
+  }
+  .rrow .reason-preview{
+    font-family:var(--font-mono);font-size:11.5px;color:var(--muted);line-height:1.55;
+    padding:var(--s-2) var(--s-3);background:var(--bg-2);border-radius:var(--r-xs);
+    border-left:2px solid var(--line-3);
+  }
+  .rrow .reason-preview::before{content:"$ ";color:var(--muted-3)}
+  .rrow .ev-chips{
+    display:flex;gap:6px;flex-wrap:wrap;font-family:var(--font-mono);font-size:10.5px;
+  }
+  .rrow .rowfoot{
+    display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);flex-wrap:wrap;
+    padding-top:var(--s-2);border-top:1px dashed var(--line);
+    font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.05em;
+  }
+  .rrow .rowfoot .payout{color:var(--sev-pending);font-weight:600}
+  .rrow .rowfoot .payout.zero{color:var(--muted-3)}
+
+  /* Evidence chips */
+  .ev-chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 9px;background:var(--bg-2);border:1px solid var(--line-2);
+    border-radius:var(--r-xs);color:var(--muted);
+    transition:all var(--dur-1) var(--ease);
+  }
+  .ev-chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(94,234,212,.05)}
+  .ev-chip .arrow{color:var(--muted-3)}
+  .ev-chip .host{color:var(--text-2)}
+  .ev-chip .path{color:var(--muted-2)}
+
+  /* ─────────────────────────────────────────────────────────────
+     BADGES
+     ───────────────────────────────────────────────────────────── */
   .badge{
     display:inline-flex;align-items:center;gap:6px;
-    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-    padding:4px 10px;border-radius:3px;font-weight:700;
-    background:var(--bg);border:1px solid;
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:4px 10px;border-radius:var(--r-xs);font-weight:700;
+    background:var(--bg);border:1px solid;line-height:1.2;
   }
-  .badge.high     {color:var(--sev-high);   border-color:var(--sev-high)}
-  .badge.medium   {color:var(--sev-medium); border-color:var(--sev-medium)}
-  .badge.low      {color:var(--sev-low);    border-color:var(--sev-low)}
-  .badge.debunked {color:var(--sev-debunked);border-color:var(--sev-debunked)}
-  .badge.insuff   {color:var(--sev-insuff); border-color:var(--sev-insuff)}
-  .badge.pending  {color:var(--sev-pending);border-color:var(--sev-pending)}
-  .badge.withdrawn{color:var(--muted);      border-color:var(--muted)}
+  .badge .bdot{width:6px;height:6px;border-radius:50%}
+  .badge.high     {color:var(--sev-high);   border-color:var(--sev-high);   background:var(--sev-high-bg)}
+  .badge.high .bdot{background:var(--sev-high)}
+  .badge.medium   {color:var(--sev-medium); border-color:var(--sev-medium); background:var(--sev-medium-bg)}
+  .badge.medium .bdot{background:var(--sev-medium)}
+  .badge.low      {color:var(--sev-low);    border-color:var(--sev-low);    background:var(--sev-low-bg)}
+  .badge.low .bdot{background:var(--sev-low)}
+  .badge.debunked {color:var(--sev-debunked);border-color:var(--sev-debunked); background:var(--sev-debunked-bg)}
+  .badge.debunked .bdot{background:var(--sev-debunked)}
+  .badge.insuff   {color:var(--sev-insuff); border-color:var(--sev-insuff); background:var(--sev-insuff-bg)}
+  .badge.insuff .bdot{background:var(--sev-insuff)}
+  .badge.pending  {color:var(--sev-pending);border-color:var(--sev-pending); background:var(--sev-pending-bg)}
+  .badge.pending .bdot{background:var(--sev-pending);animation:pulse 1.6s ease-in-out infinite}
+  .badge.withdrawn{color:var(--sev-withdrawn); border-color:var(--sev-withdrawn)}
+  .badge.withdrawn .bdot{background:var(--sev-withdrawn)}
+  .badge.open{color:var(--accent);border-color:var(--accent);background:rgba(94,234,212,.06)}
+  .badge.open .bdot{background:var(--accent)}
+  .badge.closed{color:var(--muted-2);border-color:var(--muted-3)}
+  .badge.closed .bdot{background:var(--muted-3)}
 
-  /* ── Verdict detail block ────────────────────────────────────── */
+  /* Small text-only sev tag */
+  .sevtag{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:2px;font-weight:700;
+  }
+  .sevtag.high    {color:var(--sev-high);   background:var(--sev-high-bg)}
+  .sevtag.medium  {color:var(--sev-medium); background:var(--sev-medium-bg)}
+  .sevtag.low     {color:var(--sev-low);    background:var(--sev-low-bg)}
+  .sevtag.debunked{color:var(--sev-debunked);background:var(--sev-debunked-bg)}
+  .sevtag.insuff  {color:var(--sev-insuff); background:var(--sev-insuff-bg)}
+
+  /* Copyable IDs / addresses */
+  .copyable{
+    display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+    color:inherit;transition:color var(--dur-1) var(--ease);
+  }
+  .copyable:hover{color:var(--accent)}
+  .copyable .cbtn{
+    font-size:10px;color:var(--muted-2);border:1px solid var(--line-2);
+    padding:1px 5px;border-radius:2px;transition:all var(--dur-1);
+  }
+  .copyable:hover .cbtn{border-color:var(--accent);color:var(--accent)}
+
+  /* ─────────────────────────────────────────────────────────────
+     VERDICT DETAIL BLOCK (report lookup)
+     ───────────────────────────────────────────────────────────── */
   .verdict{
-    margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+    margin-top:var(--s-6);background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow-2);
   }
   .verdict .vhead{
-    background:var(--bg-2);border-bottom:1px solid var(--line);padding:16px 22px;
+    background:var(--bg-2);border-bottom:1px solid var(--line);padding:var(--s-4) var(--s-6);
     display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
   }
-  .verdict .vhead .id{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.06em}
+  .verdict .vhead .id{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
   .verdict .vhead .id b{color:var(--text)}
-  .verdict .vbody{padding:22px}
-  .payout-row{
-    display:flex;gap:26px;flex-wrap:wrap;padding:14px 0;border-bottom:1px dashed var(--line);
-    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);
+  .verdict .vbody{padding:var(--s-6)}
+  .verdict .summary-quote{
+    font-family:var(--font-mono);font-size:13px;color:var(--text-2);
+    padding:var(--s-3) var(--s-4);background:var(--bg-2);border-left:3px solid var(--muted-3);
+    border-radius:0 var(--r-sm) var(--r-sm) 0;margin-bottom:var(--s-4);line-height:1.6;
   }
-  .payout-row div span:first-child{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);margin-bottom:3px}
-  .payout-row div span:last-child{color:var(--text);font-weight:700}
+  .verdict .summary-quote::before{content:"“ ";color:var(--muted-3);font-size:18px;font-family:serif}
+  .verdict .summary-quote::after{content:" ”";color:var(--muted-3);font-size:18px;font-family:serif}
+
+  .grid-facts{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;
+    margin-bottom:var(--s-4);
+  }
+  .fact{
+    background:var(--surface-2);padding:var(--s-3) var(--s-4);
+    display:flex;flex-direction:column;gap:3px;min-width:0;
+  }
+  .fact .k{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  }
+  .fact .v{
+    font-family:var(--font-mono);font-size:13px;color:var(--text);font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .fact.hi .v{color:var(--sev-high)}
+  .fact.med .v{color:var(--sev-medium)}
+  .fact.lo .v{color:var(--sev-low)}
+  .fact.ok .v{color:var(--sev-pending)}
 
   .reason{
-    margin-top:18px;padding:16px 18px;background:var(--bg-2);border-left:3px solid var(--accent);
-    border-radius:0 5px 5px 0;font-size:13.5px;line-height:1.6;
+    margin-top:var(--s-4);padding:var(--s-4) var(--s-5);background:var(--bg-2);
+    border-left:3px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;
+    font-size:13.5px;line-height:1.65;color:var(--text-2);
   }
   .reason .rl{
-    font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px;
   }
-  .reason .rl::before{content:"$";color:var(--muted-2)}
+  .reason .rl::before{content:"$"; color:var(--muted-2)}
 
   .injection{
-    margin-top:14px;padding:12px 16px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.35);
-    border-radius:5px;color:var(--sev-high);font-family:'JetBrains Mono',monospace;font-size:12px;
+    margin-top:var(--s-4);padding:var(--s-3) var(--s-4);background:rgba(255,77,109,.08);
+    border:1px solid rgba(255,77,109,.35);border-radius:var(--r-sm);color:var(--sev-high);
+    font-family:var(--font-mono);font-size:12px;display:flex;align-items:center;gap:10px;
+  }
+  .injection::before{content:"⚠";font-size:18px}
+
+  .ev-block{
+    margin-top:var(--s-4);padding-top:var(--s-4);border-top:1px dashed var(--line);
+  }
+  .ev-block .lbl{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.14em;
+    text-transform:uppercase;margin-bottom:var(--s-3);
+  }
+  .ev-block .lbl::before{content:"// ";color:var(--muted-3)}
+  .ev-list{display:flex;flex-direction:column;gap:8px}
+  .ev-row{
     display:flex;align-items:center;gap:10px;
+    padding:9px 12px;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-xs);
+    font-family:var(--font-mono);font-size:12px;color:var(--muted);
+    transition:all var(--dur-1) var(--ease);
   }
-  .injection::before{content:"⚠";font-size:16px}
+  .ev-row:hover{border-color:var(--accent);color:var(--accent);background:rgba(94,234,212,.04)}
+  .ev-row .arr{color:var(--muted-3)}
+  .ev-row .host{color:var(--text-2);font-weight:600}
+  .ev-row .path{color:var(--muted-2)}
+  .ev-row .note{color:var(--muted-3);font-size:11px;margin-left:8px;font-style:italic}
 
-  .ev{
-    margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);
-    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+  .prog-summary{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;
+    margin-bottom:var(--s-4);
   }
-  .ev-item{margin-top:6px}
-  .ev-item a{color:var(--accent-2);text-decoration:none;border-bottom:1px dashed var(--accent-2)}
-  .ev-item a:hover{color:var(--accent)}
+  .prog-summary .p{
+    background:var(--bg-2);padding:var(--s-3) var(--s-4);
+    display:flex;flex-direction:column;gap:3px;font-family:var(--font-mono);
+  }
+  .prog-summary .p .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
+  .prog-summary .p .v{font-size:12.5px;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis}
 
-  .withdrawbtn{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
+  .withdrawbtn{
+    margin-top:var(--s-5);display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+    padding:var(--s-4);background:rgba(94,234,212,.05);border:1px solid rgba(94,234,212,.2);
+    border-radius:var(--r-sm);
+  }
+  .withdrawbtn button{margin-top:0}
+  .withdrawbtn .wtext{
+    font-family:var(--font-mono);font-size:12px;color:var(--muted);
+  }
+  .withdrawbtn .wtext b{color:var(--sev-pending)}
 
+  /* ─────────────────────────────────────────────────────────────
+     EMPTY / SKELETON
+     ───────────────────────────────────────────────────────────── */
   .empty{
-    text-align:center;padding:40px 20px;color:var(--muted);font-size:13.5px;
-    font-family:'JetBrains Mono',monospace;
+    text-align:center;padding:var(--s-8) var(--s-5);color:var(--muted);font-size:13.5px;
+    font-family:var(--font-mono);border:1px dashed var(--line);border-radius:var(--r-sm);
+    background:var(--bg-2);
   }
-  .kbar{display:flex;gap:20px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:16px;letter-spacing:.06em}
-  .kbar span{display:flex;align-items:center;gap:6px}
-  .kbar b{color:var(--text);font-weight:700}
+  .empty .em-icon{font-size:28px;margin-bottom:10px;opacity:.6}
+  .skeleton{display:flex;flex-direction:column;gap:var(--s-3)}
+  .skel{
+    height:96px;background:linear-gradient(90deg,var(--surface) 0%,var(--surface-2) 50%,var(--surface) 100%);
+    background-size:200% 100%;border:1px solid var(--line);border-radius:var(--r-md);
+    animation:sk 1.2s linear infinite;
+  }
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
+  /* ─────────────────────────────────────────────────────────────
+     FOOTER
+     ───────────────────────────────────────────────────────────── */
   footer{
-    margin-top:80px;padding-top:22px;border-top:1px solid var(--line);
-    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
-    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em;
+    margin-top:var(--s-9);padding-top:var(--s-5);border-top:1px solid var(--line);
+    display:grid;grid-template-columns:1fr auto;gap:var(--s-3);
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.05em;
   }
+  footer .ftext{color:var(--muted-2);max-width:520px;line-height:1.6}
+  footer .ftext b{color:var(--text-2)}
+  footer .flinks{display:flex;gap:var(--s-4);flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}
   footer a{color:var(--muted)}
   footer a:hover{color:var(--accent)}
-  .note{font-size:11.5px;color:var(--muted-2);margin-top:10px;font-family:'JetBrains Mono',monospace}
-  .prog-summary{
-    background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:14px 16px;
-    margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 16px;
+  .contract-line{margin-top:6px;color:var(--muted-2);font-size:11px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .contract-line b{color:var(--text-2)}
+  @media(max-width:640px){footer{grid-template-columns:1fr}footer .flinks{justify-content:flex-start}}
+
+  .note{font-size:11.5px;color:var(--muted-2);margin-top:var(--s-3);font-family:var(--font-mono)}
+
+  /* ─────────────────────────────────────────────────────────────
+     TOAST STACK
+     ───────────────────────────────────────────────────────────── */
+  .toaster{
+    position:fixed;top:20px;right:20px;z-index:100;
+    display:flex;flex-direction:column;gap:10px;max-width:380px;pointer-events:none;
   }
-  .prog-summary b{color:var(--text)}
-  @media(max-width:640px){.hero h1{font-size:24px}}
+  .toast{
+    pointer-events:auto;
+    background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);
+    padding:14px 16px;box-shadow:var(--shadow-2);
+    display:flex;flex-direction:column;gap:6px;
+    animation:toastIn .28s var(--ease);
+    border-left:3px solid var(--muted-3);
+    position:relative;overflow:hidden;
+  }
+  .toast.work{border-left-color:var(--accent)}
+  .toast.ok{border-left-color:var(--ok)}
+  .toast.err{border-left-color:var(--danger)}
+  .toast.info{border-left-color:var(--sev-insuff)}
+  .toast .th{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .toast.work .th{color:var(--accent)}
+  .toast.ok .th{color:var(--ok)}
+  .toast.err .th{color:var(--danger)}
+  .toast.info .th{color:var(--sev-insuff)}
+  .toast .tbody{
+    font-family:var(--font-sans);font-size:13px;color:var(--text-2);line-height:1.5;
+  }
+  .toast .tfoot{
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    font-family:var(--font-mono);font-size:10.5px;color:var(--muted);
+  }
+  .toast .tfoot a{color:var(--accent-2)}
+  .toast .tfoot button{
+    background:none;border:1px solid var(--line-2);color:var(--muted);
+    font-family:var(--font-mono);font-size:10.5px;padding:2px 6px;border-radius:2px;cursor:pointer;
+  }
+  .toast .tfoot button:hover{color:var(--accent);border-color:var(--accent)}
+  .toast .close{
+    position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted-2);
+    font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:2px;
+  }
+  .toast .close:hover{color:var(--text)}
+  .toast .spin{width:11px;height:11px}
+  @keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+  .toast.leaving{animation:toastOut .25s var(--ease) forwards}
+  @keyframes toastOut{to{opacity:0;transform:translateX(20px)}}
+
+  /* ─────────────────────────────────────────────────────────────
+     MODAL (How it works)
+     ───────────────────────────────────────────────────────────── */
+  .modal-back{
+    position:fixed;inset:0;background:rgba(6,8,12,.75);backdrop-filter:blur(4px);
+    display:none;align-items:center;justify-content:center;z-index:200;padding:var(--s-4);
+    animation:fadeIn .18s var(--ease);
+  }
+  .modal-back.show{display:flex}
+  .modal{
+    background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);
+    max-width:640px;width:100%;max-height:88vh;overflow-y:auto;
+    box-shadow:var(--shadow-2);animation:mIn .22s var(--ease);
+  }
+  @keyframes mIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  .modal-head{
+    padding:var(--s-5) var(--s-6);border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:var(--bg-2);
+  }
+  .modal-head h2{
+    font-family:var(--font-sans);font-weight:600;font-size:17px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .modal-head h2::before{
+    content:"";width:9px;height:9px;background:var(--accent);border-radius:2px;
+    box-shadow:0 0 10px rgba(94,234,212,.6);
+  }
+  .modal-close{
+    background:none;border:1px solid var(--line-2);color:var(--muted);
+    font-family:var(--font-mono);font-size:11px;padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;
+  }
+  .modal-close:hover{color:var(--text);border-color:var(--accent)}
+  .modal-body{padding:var(--s-6)}
+  .step{
+    display:grid;grid-template-columns:44px 1fr;gap:var(--s-4);
+    padding:var(--s-4) 0;border-bottom:1px dashed var(--line);
+  }
+  .step:last-child{border-bottom:none}
+  .step .num{
+    font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--accent);
+    display:flex;align-items:flex-start;justify-content:center;
+  }
+  .step .content h4{
+    font-family:var(--font-sans);font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text);
+  }
+  .step .content p{color:var(--muted);font-size:13px;line-height:1.55}
+  .step .content .tag{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);margin-top:6px;display:inline-block;
+  }
+
+  /* Explorer link */
+  .exp{
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .exp:hover{color:var(--accent)}
+  .exp::before{content:"⧉";font-size:12px}
+
+  @media(max-width:640px){
+    .hero h1{font-size:24px}
+    .hero{padding:var(--s-5) var(--s-5) var(--s-5)}
+    .toaster{max-width:calc(100vw - 40px);right:10px;top:10px}
+  }
 </style>
 </head>
 <body>
@@ -294,22 +799,29 @@
   <!-- ── NAV ────────────────────────────────────────────────── -->
   <div class="nav">
     <div class="brandline">
-      <img src="/logo.svg" alt="AegisWatch logo" />
+      <div class="logo-wrap"><img src="/logo.svg" alt="AegisWatch logo" /></div>
       <div>
         <div class="name">AegisWatch</div>
-        <div class="tick">$ security-triage :: on-chain</div>
+        <div class="tick">$ security-triage :: on-chain<span class="cursor">_</span></div>
       </div>
     </div>
-    <div class="wallet-wrap">
+    <div class="nav-actions">
+      <button class="link-btn" id="howBtn">How it works</button>
       <span class="netpill" id="netpill">GenLayer studionet</span>
-      <button class="connect" id="connectBtn">Connect Wallet</button>
-      <span class="addr" id="addrLabel"></span>
+      <div class="wallet-wrap">
+        <button class="connect" id="connectBtn">Connect Wallet</button>
+        <span class="wallet-chip" id="walletChip">
+          <span class="dot"></span>
+          <span id="walletAddr" class="mono">0x…</span>
+          <button id="walletCopyBtn" title="Copy address">copy</button>
+        </span>
+      </div>
     </div>
   </div>
 
   <!-- ── HERO ────────────────────────────────────────────────── -->
   <section class="hero">
-    <div class="hero-eyebrow">// Decentralized bounty verifier</div>
+    <div class="hero-eyebrow">Decentralized bounty verifier · GenLayer studionet</div>
     <h1>Reports are triaged by an <em>on-chain AI Jury</em> that reads the evidence, assigns a severity tier, and settles the bounty — no maintainer, no arbiter in the middle.</h1>
     <p>Sponsors fund a bounty pool with a HIGH / MEDIUM / LOW payout schedule. Researchers submit reports with public evidence URLs and a small anti-spam bond. Validators re-fetch every source, re-run the triage prompt, and only agree when the meaning of the verdict matches — not just its shape.</p>
     <div class="sev-legend">
@@ -321,81 +833,123 @@
     </div>
   </section>
 
+  <!-- ── STATS ───────────────────────────────────────────────── -->
+  <section class="stats" id="statsStrip">
+    <div class="stat total loading"><span class="label">Programs</span><span class="value" id="s_programs">—</span><span class="sub">bounty pools open</span></div>
+    <div class="stat reports loading"><span class="label">Reports</span><span class="value" id="s_reports">—</span><span class="sub">filed to date</span></div>
+    <div class="stat locked loading"><span class="label">Bounty locked</span><span class="value" id="s_locked">—</span><span class="sub">wei · escrowed</span></div>
+    <div class="stat verified loading"><span class="label">Verified</span><span class="value" id="s_verified">—</span><span class="sub">HIGH · MED · LOW</span></div>
+    <div class="stat debunked loading"><span class="label">Debunked</span><span class="value" id="s_debunked">—</span><span class="sub">bond forfeited</span></div>
+  </section>
+
   <!-- ── TABS ────────────────────────────────────────────────── -->
   <nav class="tabs">
-    <button class="active" data-tab="fund">01 · Fund Program</button>
-    <button data-tab="submit">02 · Submit Report</button>
-    <button data-tab="convene">03 · Convene Verifier</button>
-    <button data-tab="recent">04 · Recent Reports</button>
+    <button class="active" data-tab="fund"><span class="tabnum">01 ·</span> Fund Program</button>
+    <button data-tab="submit"><span class="tabnum">02 ·</span> Submit Report</button>
+    <button data-tab="convene"><span class="tabnum">03 ·</span> Convene Verifier</button>
+    <button data-tab="recent"><span class="tabnum">04 ·</span> Recent Reports</button>
   </nav>
 
   <!-- ── TAB 1: Fund Program ─────────────────────────────────── -->
   <div class="panel active" id="tab-fund">
     <div class="card">
-      <h3>Create a Bounty Program</h3>
-      <p class="sub">Sponsor opens a scope, escrows the initial pool, and locks a per-tier payout schedule. Reporters cannot be paid more than the schedule allows.</p>
+      <div class="card-head">
+        <div>
+          <h3>Create a Bounty Program</h3>
+          <p class="sub">Sponsor opens a scope, escrows the initial pool, and locks a per-tier payout schedule. Reporters cannot be paid more than the schedule allows.</p>
+        </div>
+        <div class="card-est mono" id="p_est">Deposit: <b>—</b></div>
+      </div>
 
-      <label>Scope URL <span class="hint">public docs / bug-bounty policy page</span></label>
+      <label>Scope URL <span class="req">*</span><span class="hint">public docs / bug-bounty policy page</span></label>
       <input id="p_scope_url" placeholder="https://your-project.example/security" />
+      <div class="field-error" id="p_scope_url_err">Must be a valid http(s) URL.</div>
 
       <label>Scope Summary <span class="hint">one line describing what is in scope</span></label>
-      <input id="p_scope_sum" placeholder="e.g. Smart contracts under /contracts and API endpoints under api.project.example" />
+      <input id="p_scope_sum" placeholder="e.g. Smart contracts under /contracts and API endpoints under api.project.example" maxlength="240" />
 
       <div class="row">
         <div>
-          <label>Initial Pool <span class="hint">wei sent with tx</span></label>
+          <label>Initial Pool <span class="req">*</span><span class="hint">wei sent with tx</span></label>
           <input id="p_pool" type="number" min="1" placeholder="2000000" />
+          <div class="field-error" id="p_pool_err">Pool must be a positive integer.</div>
         </div>
         <div>
           <label>Min Bond <span class="hint">reporter stake</span></label>
           <input id="p_bond" type="number" min="0" placeholder="25000" />
         </div>
       </div>
-      <div class="row">
-        <div>
-          <label>HIGH Payout</label>
-          <input id="p_high" type="number" min="0" placeholder="800000" />
+
+      <div class="schedule">
+        <div class="schead">
+          <span>Severity payout schedule</span>
+          <span class="mono" id="p_scheduleHint">HIGH ≥ MEDIUM ≥ LOW · HIGH ≤ pool</span>
         </div>
-        <div>
-          <label>MEDIUM Payout</label>
-          <input id="p_med" type="number" min="0" placeholder="300000" />
+        <div class="row">
+          <div>
+            <label style="margin-top:0"><span class="sevtag high">HIGH</span> Payout</label>
+            <input id="p_high" type="number" min="0" placeholder="800000" />
+          </div>
+          <div>
+            <label style="margin-top:0"><span class="sevtag medium">MEDIUM</span> Payout</label>
+            <input id="p_med" type="number" min="0" placeholder="300000" />
+          </div>
+          <div>
+            <label style="margin-top:0"><span class="sevtag low">LOW</span> Payout</label>
+            <input id="p_low" type="number" min="0" placeholder="50000" />
+          </div>
         </div>
-        <div>
-          <label>LOW Payout</label>
-          <input id="p_low" type="number" min="0" placeholder="50000" />
-        </div>
+        <div class="field-error" id="p_sched_err" style="margin-top:8px">Payouts must satisfy HIGH ≥ MEDIUM ≥ LOW, and HIGH must fit inside the pool.</div>
       </div>
 
-      <button class="act" id="p_btn">Escrow Pool &amp; Create Program</button>
+      <div class="actrow">
+        <button class="act" id="p_btn" disabled>Escrow Pool &amp; Create Program</button>
+        <span class="mono" style="font-size:11px;color:var(--muted-2)">gas paid by sponsor · escrow held by contract</span>
+      </div>
       <div class="status" id="p_status"></div>
-      <p class="note">// HIGH &gt;= MEDIUM &gt;= LOW · HIGH payout must fit inside the pool.</p>
+      <p class="note">// The pool balance is enforced on-chain: no verdict can pay more than the schedule, and no payout exceeds the remaining pool.</p>
     </div>
   </div>
 
   <!-- ── TAB 2: Submit Report ────────────────────────────────── -->
   <div class="panel" id="tab-submit">
     <div class="card">
-      <h3>File a Bounty Report</h3>
-      <p class="sub">Attach a bond &ge; the program minimum. On any verified severity, your bond returns with the payout. On DEBUNKED, the bond is forfeited to the pool.</p>
+      <div class="card-head">
+        <div>
+          <h3>File a Bounty Report</h3>
+          <p class="sub">Attach a bond &ge; the program minimum. On any verified severity, your bond returns with the payout. On DEBUNKED, the bond is forfeited to the pool.</p>
+        </div>
+        <div class="card-est mono" id="r_est">Bond: <b>—</b></div>
+      </div>
 
       <div class="row">
         <div>
-          <label>Program ID</label>
+          <label>Program ID <span class="req">*</span></label>
           <input id="r_pid" type="number" min="0" placeholder="0" />
+          <div class="field-error" id="r_pid_err">Program ID required.</div>
         </div>
         <div>
-          <label>Bond <span class="hint">must meet program minimum</span></label>
+          <label>Bond <span class="req">*</span><span class="hint">must meet program minimum</span></label>
           <input id="r_bond" type="number" min="0" placeholder="25000" />
+          <div class="field-error" id="r_bond_err">Bond required.</div>
         </div>
       </div>
 
-      <label>Report Summary <span class="hint">what is the alleged issue</span></label>
-      <textarea id="r_summary" placeholder="e.g. Signature-replay in /api/withdraw allows draining funds; PoC lands in the linked disclosed PR."></textarea>
+      <div id="r_progHint" class="prog-summary" style="display:none"></div>
 
-      <label>Evidence URLs <span class="hint">one per line — advisory, PR, blog, on-chain trace, mirrored post</span></label>
-      <textarea id="r_urls" rows="4" placeholder="https://raw.githubusercontent.com/org/repo/main/advisories/GHSA-xxx.txt&#10;https://github.com/org/repo/pull/1234"></textarea>
+      <label>Report Summary <span class="req">*</span><span class="hint">what is the alleged issue</span></label>
+      <textarea id="r_summary" maxlength="1200" placeholder="e.g. Signature-replay in /api/withdraw allows draining funds; PoC lands in the linked disclosed PR."></textarea>
+      <div class="field-error" id="r_summary_err">Summary required.</div>
 
-      <button class="act" id="r_btn">Stake Bond &amp; Submit Report</button>
+      <label>Evidence URLs <span class="req">*</span><span class="hint">one per line — advisory, PR, blog, on-chain trace, mirrored post · max 16</span></label>
+      <textarea id="r_urls" rows="4" placeholder="https://raw.githubusercontent.com/org/repo/main/advisories/GHSA-xxx.txt
+https://github.com/org/repo/pull/1234"></textarea>
+      <div class="field-error" id="r_urls_err">At least one valid http(s) URL required.</div>
+
+      <div class="actrow">
+        <button class="act" id="r_btn" disabled>Stake Bond &amp; Submit Report</button>
+        <span class="mono" style="font-size:11px;color:var(--muted-2)">bond escrowed until verdict</span>
+      </div>
       <div class="status" id="r_status"></div>
     </div>
   </div>
@@ -408,25 +962,30 @@
 
       <div class="row">
         <div>
-          <label>Report ID</label>
+          <label>Report ID <span class="req">*</span></label>
           <input id="v_id" type="number" min="0" placeholder="0" />
         </div>
       </div>
-      <button class="act" id="v_btn">Request AI Triage</button>
+      <div class="actrow">
+        <button class="act" id="v_btn">Request AI Triage</button>
+        <span class="mono" style="font-size:11px;color:var(--muted-2)">no value sent · gas only</span>
+      </div>
       <div class="status" id="v_status"></div>
-      <p class="note">// Verdict returns: severity · payout · reason · injection_flag.</p>
+      <p class="note">// Verdict returns: severity · payout · reason · injection_flag. Anyone can convene a pending report — the verdict is deterministic once evidence is public.</p>
     </div>
 
     <div class="card">
       <h3>Lookup a Report</h3>
-      <p class="sub">Read the current state and verdict directly from the contract.</p>
+      <p class="sub">Read the current state and full verdict directly from the contract. Wallet not required.</p>
       <div class="row">
         <div>
           <label>Report ID</label>
           <input id="l_id" type="number" min="0" placeholder="0" />
         </div>
       </div>
-      <button class="act ghost" id="l_btn">Fetch Verdict</button>
+      <div class="actrow">
+        <button class="act ghost" id="l_btn">Fetch Verdict</button>
+      </div>
       <div class="status" id="l_status"></div>
       <div id="l_result"></div>
     </div>
@@ -435,23 +994,119 @@
   <!-- ── TAB 4: Recent Reports (public read) ─────────────────── -->
   <div class="panel" id="tab-recent">
     <div class="card">
-      <h3>Recent Reports</h3>
-      <p class="sub">Every report filed on this contract, newest first. No wallet needed — this reads through a public read-only client.</p>
-      <div class="kbar" id="kbar">
-        <span>Contract: <b class="mono" id="contractLabel">…</b></span>
-        <span>Programs: <b id="k_progs">…</b></span>
-        <span>Reports: <b id="k_reports">…</b></span>
+      <div class="card-head">
+        <div>
+          <h3>Recent Reports</h3>
+          <p class="sub">Every report filed on this contract, sourced live from the chain. No wallet needed — this reads through a public read-only client.</p>
+        </div>
+        <div class="actrow" style="margin-top:0">
+          <button class="act ghost" id="rc_btn">Refresh</button>
+        </div>
       </div>
-      <button class="act ghost" id="rc_btn">Refresh</button>
+
+      <div class="filterbar">
+        <label>Status
+          <select id="f_status">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="verified">Verified (any tier)</option>
+            <option value="debunked">Debunked</option>
+            <option value="insuff">Insufficient proof</option>
+            <option value="withdrawn">Withdrawn</option>
+          </select>
+        </label>
+        <label>Severity
+          <select id="f_sev">
+            <option value="all">All</option>
+            <option value="HIGH">HIGH</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="LOW">LOW</option>
+            <option value="DEBUNKED">DEBUNKED</option>
+            <option value="INSUFFICIENT_PROOF">INSUFF</option>
+          </select>
+        </label>
+        <label>Sort
+          <select id="f_sort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="payout">Highest payout</option>
+          </select>
+        </label>
+        <div class="search">
+          <label style="margin-bottom:4px">Search</label>
+          <input id="f_q" type="text" placeholder="text in summary / reason / reporter" />
+        </div>
+      </div>
+
       <div class="status" id="rc_status"></div>
       <div id="rc_list" class="rlist"></div>
     </div>
   </div>
 
   <footer>
-    <span>AegisWatch · Intelligent Contract on GenLayer (studionet)</span>
-    <span><a href="https://explorer-studio.genlayer.com" target="_blank" rel="noopener">Explorer</a> · <a href="https://studio.genlayer.com" target="_blank" rel="noopener">Studio</a> · <a href="https://docs.genlayer.com" target="_blank" rel="noopener">Docs</a></span>
+    <div>
+      <div class="ftext">
+        <b>AegisWatch</b> — an Intelligent Contract on GenLayer (studionet). Bounty verdicts are decided by AI validators that re-fetch every evidence URL and agree only when their independent triage matches within one severity tier.
+      </div>
+      <div class="contract-line mono">
+        contract <b><a id="footerContract" href="#" target="_blank" rel="noopener">not configured</a></b>
+        <button id="footerCopyContract" class="link-btn" style="padding:3px 8px;font-size:10px;margin-left:6px">copy</button>
+      </div>
+    </div>
+    <div class="flinks">
+      <a href="https://explorer-studio.genlayer.com" target="_blank" rel="noopener">Explorer</a>
+      <a href="https://studio.genlayer.com" target="_blank" rel="noopener">Studio</a>
+      <a href="https://docs.genlayer.com" target="_blank" rel="noopener">Docs</a>
+      <a href="https://github.com/" target="_blank" rel="noopener" id="ghLink">GitHub</a>
+    </div>
   </footer>
+</div>
+
+<!-- Toast stack -->
+<div class="toaster" id="toaster" aria-live="polite" aria-atomic="true"></div>
+
+<!-- How it works modal -->
+<div class="modal-back" id="howModal" role="dialog" aria-modal="true" aria-labelledby="howTitle">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="howTitle">How AegisWatch works</h2>
+      <button class="modal-close" id="howClose" aria-label="Close">esc ✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="step">
+        <div class="num">01</div>
+        <div class="content">
+          <h4>Sponsor funds a Program</h4>
+          <p>A project escrows a bounty pool and locks a per-tier payout schedule (HIGH ≥ MEDIUM ≥ LOW) plus a minimum reporter bond. The scope URL and summary are recorded on-chain.</p>
+          <span class="tag">create_program(...)</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <div class="content">
+          <h4>Researcher files a Report</h4>
+          <p>Anyone can submit a report against an open program: a summary, evidence URLs (advisory, PR, on-chain trace, mirrored post), and a bond ≥ the program's minimum. Bond is anti-spam collateral.</p>
+          <span class="tag">submit_report(...)</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <div class="content">
+          <h4>AI Jury reaches consensus</h4>
+          <p>convene_verifier fires the on-chain nondet block. Each validator independently fetches every evidence URL, runs a security-triage prompt, and votes. Consensus requires severity within one tier and injection flags in agreement.</p>
+          <span class="tag">convene_verifier(...) · nondet</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <div class="content">
+          <h4>Contract settles the bounty</h4>
+          <p>HIGH/MEDIUM/LOW: reporter withdraws payout + bond. INSUFFICIENT_PROOF: bond returned, no payout. DEBUNKED: bond forfeited to the pool. The contract re-verifies the arithmetic post-consensus.</p>
+          <span class="tag">withdraw_report(...)</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -463,22 +1118,106 @@ import { CONTRACT_ADDRESS, CHAIN } from "./src/config.js";
 const chain = CHAIN === "studio" ? studionet : localnet;
 const CHAIN_ID_HEX = "0x" + chain.id.toString(16);
 const RPC_URL = chain.rpcUrls?.default?.http?.[0] || "https://studio.genlayer.com/api";
+const EXPLORER = "https://explorer-studio.genlayer.com";
 let account = null;
 let client = null;
 const readOnlyClient = createClient({ chain });
 
 const $ = (id) => document.getElementById(id);
-document.getElementById("contractLabel").textContent =
-  CONTRACT_ADDRESS && CONTRACT_ADDRESS !== "TO_BE_FILLED_AFTER_DEPLOY"
-    ? CONTRACT_ADDRESS.slice(0,8) + "…" + CONTRACT_ADDRESS.slice(-6)
-    : "not configured";
 
+// Footer + configured-state helpers
+const contractConfigured = !!(CONTRACT_ADDRESS && CONTRACT_ADDRESS !== "TO_BE_FILLED_AFTER_DEPLOY");
+if (contractConfigured) {
+  const short = CONTRACT_ADDRESS.slice(0,10) + "…" + CONTRACT_ADDRESS.slice(-8);
+  $("footerContract").textContent = short;
+  $("footerContract").href = `${EXPLORER}/contracts/${CONTRACT_ADDRESS}`;
+} else {
+  $("footerCopyContract").style.display = "none";
+}
+$("footerCopyContract").addEventListener("click", () => {
+  if (!contractConfigured) return;
+  navigator.clipboard?.writeText(CONTRACT_ADDRESS).then(()=>toast("info","Copied","Contract address copied to clipboard."));
+});
+
+// ── Toast stack ───────────────────────────────────────────────────
+let toastId = 0;
+function toast(kind, title, body, opts={}){
+  const id = "toast_" + (++toastId);
+  const el = document.createElement("div");
+  el.className = "toast " + kind;
+  el.id = id;
+  const spinner = kind === "work" ? '<span class="spin"></span>' : "";
+  const titleTxt = String(title||"").toUpperCase();
+  const bodyTxt = String(body||"");
+  let footHtml = "";
+  const foot = [];
+  if (opts.tx) {
+    const shortTx = opts.tx.slice(0,10) + "…" + opts.tx.slice(-6);
+    foot.push(`<a href="${EXPLORER}/tx/${opts.tx}" target="_blank" rel="noopener" class="exp">${shortTx}</a>`);
+    foot.push(`<button data-copy-tx="${opts.tx}">copy hash</button>`);
+  }
+  if (foot.length) footHtml = `<div class="tfoot">${foot.join("")}</div>`;
+  el.innerHTML = `
+    <button class="close" data-close="${id}" aria-label="Close">✕</button>
+    <div class="th">${spinner}<span>${escapeHtml(titleTxt)}</span></div>
+    <div class="tbody">${escapeHtml(bodyTxt)}</div>
+    ${footHtml}`;
+  $("toaster").appendChild(el);
+  const ttl = opts.ttl ?? (kind === "work" ? 12000 : 6000);
+  const remove = () => {
+    if (!document.getElementById(id)) return;
+    el.classList.add("leaving");
+    setTimeout(()=>el.remove(), 250);
+  };
+  if (ttl > 0 && !opts.sticky) setTimeout(remove, ttl);
+  return { id, remove, update: (kind2, title2, body2, opts2={}) => {
+    if (!document.getElementById(id)) return;
+    el.className = "toast " + kind2;
+    const spin2 = kind2 === "work" ? '<span class="spin"></span>' : "";
+    const foot2 = [];
+    if (opts2.tx) {
+      const st = opts2.tx.slice(0,10) + "…" + opts2.tx.slice(-6);
+      foot2.push(`<a href="${EXPLORER}/tx/${opts2.tx}" target="_blank" rel="noopener" class="exp">${st}</a>`);
+      foot2.push(`<button data-copy-tx="${opts2.tx}">copy hash</button>`);
+    }
+    el.innerHTML = `
+      <button class="close" data-close="${id}" aria-label="Close">✕</button>
+      <div class="th">${spin2}<span>${escapeHtml(String(title2||"").toUpperCase())}</span></div>
+      <div class="tbody">${escapeHtml(String(body2||""))}</div>
+      ${foot2.length?`<div class="tfoot">${foot2.join("")}</div>`:""}`;
+    const ttl2 = opts2.ttl ?? (kind2 === "work" ? 12000 : 6000);
+    if (ttl2 > 0 && !opts2.sticky) setTimeout(remove, ttl2);
+  }};
+}
+document.addEventListener("click", (ev)=>{
+  const closeBtn = ev.target.closest("[data-close]");
+  if (closeBtn) {
+    const t = document.getElementById(closeBtn.dataset.close);
+    if (t){ t.classList.add("leaving"); setTimeout(()=>t.remove(),250); }
+  }
+  const copyBtn = ev.target.closest("[data-copy-tx]");
+  if (copyBtn) {
+    navigator.clipboard?.writeText(copyBtn.dataset.copyTx).then(()=>{
+      copyBtn.textContent = "copied";
+      setTimeout(()=>{ copyBtn.textContent = "copy hash"; }, 1400);
+    });
+  }
+});
+
+// Legacy status helper (used by lookup and convene panels)
 function setStatus(el, kind, msg, spinning=false){
   el.className = "status show " + kind;
-  el.innerHTML = (spinning ? '<span class="spin"></span>' : '') + '<span>'+msg+'</span>';
+  el.innerHTML = (spinning ? '<span class="spin"></span>' : '') + '<span>'+escapeHtml(msg)+'</span>';
 }
 function clearStatus(el){ el.className = "status"; }
 
+// ── How-it-works modal ────────────────────────────────────────────
+$("howBtn").addEventListener("click", ()=>$("howModal").classList.add("show"));
+$("howClose").addEventListener("click", ()=>$("howModal").classList.remove("show"));
+$("howModal").addEventListener("click", (e)=>{ if (e.target === $("howModal")) $("howModal").classList.remove("show"); });
+document.addEventListener("keydown", (e)=>{ if (e.key === "Escape") $("howModal").classList.remove("show"); });
+
+// ── Network / wallet ──────────────────────────────────────────────
 async function ensureNetwork(){
   if (!window.ethereum) return;
   try {
@@ -495,7 +1234,7 @@ async function ensureNetwork(){
           chainName: "GenLayer Studio Network",
           nativeCurrency: { name: "GEN Token", symbol: "GEN", decimals: 18 },
           rpcUrls: [RPC_URL],
-          blockExplorerUrls: ["https://explorer-studio.genlayer.com"],
+          blockExplorerUrls: [EXPLORER],
         }],
       });
     } else {
@@ -504,43 +1243,58 @@ async function ensureNetwork(){
   }
 }
 
-// ── Wallet ────────────────────────────────────────────────────────
 $("connectBtn").addEventListener("click", async () => {
   try {
     if (!window.ethereum) {
-      $("addrLabel").textContent = "MetaMask required";
+      toast("err","Wallet not detected","MetaMask (or compatible EIP-1193 wallet) is required to connect.");
       return;
     }
     await ensureNetwork();
     const [addr] = await window.ethereum.request({ method: "eth_requestAccounts" });
     account = addr;
     client = createClient({ chain, account: addr });
-    $("addrLabel").textContent = addr.slice(0,6) + "…" + addr.slice(-4);
-    $("connectBtn").textContent = "Connected";
-    $("connectBtn").disabled = true;
+    $("connectBtn").style.display = "none";
+    $("walletChip").classList.add("show");
+    $("walletAddr").textContent = addr.slice(0,6) + "…" + addr.slice(-4);
+    toast("ok","Wallet connected","Signed in as " + addr.slice(0,6) + "…" + addr.slice(-4));
+    validateAll();
   } catch (e) {
-    $("addrLabel").textContent = "Wallet connection error";
+    toast("err","Wallet connection failed", String(e.message || e));
     console.error(e);
   }
 });
+$("walletCopyBtn").addEventListener("click", ()=>{
+  if (account) navigator.clipboard?.writeText(account).then(()=>toast("info","Copied","Wallet address copied to clipboard."));
+});
 
-function ensureReady(statusEl){
-  if (!client || !account){ setStatus(statusEl,"err","Please connect your wallet first."); return false; }
-  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "TO_BE_FILLED_AFTER_DEPLOY"){
-    setStatus(statusEl,"err","Contract address is not configured in src/config.js.");
+function ensureReady(){
+  if (!client || !account){
+    toast("err","Wallet required","Connect your wallet first, then retry.");
+    return false;
+  }
+  if (!contractConfigured){
+    toast("err","Contract not configured","Set VITE_CONTRACT_ADDRESS or edit src/config.js.");
     return false;
   }
   return true;
 }
 
-async function writeTx(method, args, value, statusEl, msg){
-  setStatus(statusEl,"work", msg || "Sending transaction · waiting for consensus…", true);
-  const txHash = await client.writeContract({
-    address: CONTRACT_ADDRESS, functionName: method, args,
-    value: value ? BigInt(value) : 0n,
-  });
-  await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
-  return txHash;
+async function writeTx(method, args, value, msg){
+  const t = toast("work", "Signing " + method, msg + " · confirm in wallet…", {sticky:true});
+  let txHash;
+  try {
+    txHash = await client.writeContract({
+      address: CONTRACT_ADDRESS, functionName: method, args,
+      value: value ? BigInt(value) : 0n,
+    });
+    t.update("work", method + " sent", "Awaiting validator consensus…", {tx: txHash, sticky:true});
+    await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
+    t.update("ok", method + " finalized", "Transaction confirmed on-chain.", {tx: txHash});
+    return txHash;
+  } catch (e) {
+    t.update("err", method + " failed", String(e.message || e), txHash ? {tx: txHash} : {});
+    throw e;
+  }
 }
 
 async function readContract(method, args){
@@ -555,160 +1309,253 @@ document.querySelectorAll("nav.tabs button").forEach(b=>{
     b.classList.add("active");
     $("tab-"+b.dataset.tab).classList.add("active");
     if (b.dataset.tab === "recent") loadRecent();
+    if (b.dataset.tab === "submit") tryPreviewProgram();
   });
 });
 
+// ── Validation ────────────────────────────────────────────────────
+const URL_RE = /^https?:\/\/\S+$/i;
+function markInvalid(inputEl, errEl, invalid){
+  inputEl.classList.toggle("invalid", invalid);
+  if (errEl) errEl.classList.toggle("show", invalid);
+}
+function fundValid(){
+  const scope = $("p_scope_url").value.trim();
+  const pool = Number($("p_pool").value);
+  const high = Number($("p_high").value);
+  const med  = Number($("p_med").value);
+  const low  = Number($("p_low").value);
+  const scopeOk = URL_RE.test(scope);
+  const poolOk  = Number.isFinite(pool) && pool > 0;
+  const schedOk = Number.isFinite(high) && Number.isFinite(med) && Number.isFinite(low)
+                  && high >= med && med >= low && low >= 0
+                  && high <= pool;
+  markInvalid($("p_scope_url"), $("p_scope_url_err"), scope !== "" && !scopeOk);
+  markInvalid($("p_pool"), $("p_pool_err"), $("p_pool").value !== "" && !poolOk);
+  const schedTouched = $("p_high").value !== "" && $("p_med").value !== "" && $("p_low").value !== "" && $("p_pool").value !== "";
+  if (schedTouched) $("p_sched_err").classList.toggle("show", !schedOk);
+  else $("p_sched_err").classList.remove("show");
+  $("p_est").innerHTML = poolOk ? `Deposit: <b>${pool.toLocaleString()}</b> wei` : `Deposit: <b>—</b>`;
+  if (poolOk && !schedOk) $("p_est").classList.add("warn"); else $("p_est").classList.remove("warn");
+  return scopeOk && poolOk && schedOk;
+}
+function reportValid(){
+  const pid = $("r_pid").value.trim();
+  const bond = $("r_bond").value.trim();
+  const summary = $("r_summary").value.trim();
+  const urls = $("r_urls").value.trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const pidOk = pid !== "" && Number.isFinite(Number(pid)) && Number(pid) >= 0;
+  const bondOk = bond !== "" && Number.isFinite(Number(bond)) && Number(bond) >= 0;
+  const sumOk = summary.length > 0;
+  const urlsOk = urls.length > 0 && urls.every(u => URL_RE.test(u));
+  markInvalid($("r_pid"), $("r_pid_err"), pid !== "" && !pidOk);
+  markInvalid($("r_bond"), $("r_bond_err"), bond !== "" && !bondOk);
+  markInvalid($("r_summary"), $("r_summary_err"), summary.length > 0 ? false : (summary === "" && $("r_summary").dataset.touched === "1"));
+  markInvalid($("r_urls"), $("r_urls_err"), urls.length > 0 && !urlsOk);
+  $("r_est").innerHTML = bondOk ? `Bond: <b>${Number(bond).toLocaleString()}</b> wei` : `Bond: <b>—</b>`;
+  return pidOk && bondOk && sumOk && urlsOk;
+}
+function validateAll(){
+  $("p_btn").disabled = !(fundValid() && client && account && contractConfigured);
+  $("r_btn").disabled = !(reportValid() && client && account && contractConfigured);
+}
+["p_scope_url","p_scope_sum","p_pool","p_bond","p_high","p_med","p_low"]
+  .forEach(id => $(id).addEventListener("input", validateAll));
+["r_pid","r_bond","r_summary","r_urls"].forEach(id => {
+  $(id).addEventListener("input", validateAll);
+  $(id).addEventListener("blur", () => { $(id).dataset.touched = "1"; validateAll(); });
+});
+$("r_pid").addEventListener("change", tryPreviewProgram);
+
+// Show a preview of the target program under the report form.
+async function tryPreviewProgram(){
+  const pid = $("r_pid").value.trim();
+  const hint = $("r_progHint");
+  if (pid === "" || !contractConfigured){ hint.style.display = "none"; return; }
+  try{
+    const raw = await readContract("get_program",[Number(pid)]);
+    const p = typeof raw === "string" ? JSON.parse(raw) : raw;
+    hint.style.display = "grid";
+    hint.innerHTML = `
+      <div class="p"><span class="k">Program</span><span class="v">#${p.id}</span></div>
+      <div class="p"><span class="k">Sponsor</span><span class="v" title="${p.sponsor}">${shortAddr(p.sponsor)}</span></div>
+      <div class="p"><span class="k">Pool balance</span><span class="v">${Number(p.pool_balance).toLocaleString()}</span></div>
+      <div class="p"><span class="k">Min bond</span><span class="v">${Number(p.min_bond).toLocaleString()}</span></div>
+      <div class="p"><span class="k">HIGH · MED · LOW</span><span class="v">${p.high_payout} · ${p.medium_payout} · ${p.low_payout}</span></div>
+      <div class="p"><span class="k">Status</span><span class="v">${escapeHtml(p.status || "")}</span></div>`;
+  }catch(_){ hint.style.display = "none"; }
+}
+
 // ── 1. Fund program ──────────────────────────────────────────────
 $("p_btn").addEventListener("click", async ()=>{
-  const el=$("p_status"); if(!ensureReady(el))return;
+  if(!ensureReady() || !fundValid()) return;
   try{
     const scope_url = $("p_scope_url").value.trim();
     const scope_sum = $("p_scope_sum").value.trim();
     const pool = $("p_pool").value.trim();
     const bond = $("p_bond").value.trim() || "0";
     const high = $("p_high").value.trim();
-    const med = $("p_med").value.trim();
-    const low = $("p_low").value.trim();
-    if (!scope_url || !pool || !high || !med || !low){
-      setStatus(el,"err","Fill scope URL, pool, and all three payouts.");
-      return;
-    }
+    const med  = $("p_med").value.trim();
+    const low  = $("p_low").value.trim();
     await writeTx("create_program",
       [scope_url, scope_sum, Number(high), Number(med), Number(low), Number(bond)],
-      pool, el, "Escrowing pool · opening program…");
+      pool, "Escrowing pool · opening program");
     const totals = JSON.parse(await readContract("get_totals", []));
     const pid = Math.max(totals.programs - 1, 0);
-    setStatus(el,"ok","Program #"+pid+" opened. Pool escrowed for HIGH/MEDIUM/LOW payouts.");
-  }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
+    toast("ok","Program #"+pid+" opened","Pool escrowed. Reporters can now file against this program.");
+    loadStats();
+  }catch(e){ console.error(e); }
 });
 
 // ── 2. Submit report ─────────────────────────────────────────────
 $("r_btn").addEventListener("click", async ()=>{
-  const el=$("r_status"); if(!ensureReady(el))return;
+  if(!ensureReady() || !reportValid()) return;
   try{
     const pid = $("r_pid").value.trim();
     const bond = $("r_bond").value.trim();
     const summary = $("r_summary").value.trim();
     const urls = $("r_urls").value.trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    if (pid==="" || !bond || !summary || urls.length===0){
-      setStatus(el,"err","Fill program id, bond, summary, and at least one evidence URL.");
-      return;
-    }
     const evidence = JSON.stringify(urls.map(u => ({ url: u, note: "" })));
-    await writeTx("submit_report",
-      [Number(pid), summary, evidence], bond, el,
-      "Staking bond · registering report…");
+    await writeTx("submit_report", [Number(pid), summary, evidence], bond, "Staking bond · registering report");
     const totals = JSON.parse(await readContract("get_totals", []));
     const rid = Math.max(totals.reports - 1, 0);
-    setStatus(el,"ok","Report #"+rid+" filed against program #"+pid+". Convene the verifier in the next tab.");
+    toast("ok","Report #"+rid+" filed","Filed against program #"+pid+". Convene the verifier in the next tab.");
     $("v_id").value = String(rid);
     $("l_id").value = String(rid);
-  }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
+    loadStats();
+  }catch(e){ console.error(e); }
 });
 
 // ── 3. Convene verifier ──────────────────────────────────────────
 $("v_btn").addEventListener("click", async ()=>{
-  const el=$("v_status"); if(!ensureReady(el))return;
+  const el=$("v_status"); if(!ensureReady()) return;
   try{
     const id = $("v_id").value.trim();
-    if (id===""){ setStatus(el,"err","Report ID required."); return; }
+    if (id===""){ toast("err","Report ID required","Enter the numeric report ID to convene."); return; }
     setStatus(el,"work","AI validators fetching evidence · running triage · reaching consensus. This can take 1–3 minutes.", true);
-    const txHash = await client.writeContract({
-      address: CONTRACT_ADDRESS, functionName: "convene_verifier",
-      args: [Number(id)], value: 0n,
-    });
-    await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
-    setStatus(el,"ok","AI Verifier finalized report #"+id+". Fetch the verdict below.");
+    const t = toast("work","Convening AI Verifier","Validators re-fetching evidence and voting…",{sticky:true});
+    let txHash;
+    try {
+      txHash = await client.writeContract({
+        address: CONTRACT_ADDRESS, functionName: "convene_verifier",
+        args: [Number(id)], value: 0n,
+      });
+      t.update("work","convene_verifier sent","Awaiting consensus… (1-3 min)",{tx:txHash, sticky:true});
+      await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
+      t.update("ok","Verdict finalized","AI Jury reached consensus on report #"+id,{tx:txHash});
+    } catch (e) {
+      t.update("err","Verifier failed", String(e.message||e), txHash ? {tx:txHash} : {});
+      throw e;
+    }
+    clearStatus(el);
     $("l_id").value = String(id);
     $("l_btn").click();
+    loadStats();
   }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
 });
 
-// ── Lookup report & render verdict ───────────────────────────────
+// ── Lookup / render report ───────────────────────────────────────
 const STATUS_LABEL = {
-  REPORT_PENDING: {t:"Pending", cls:"pending"},
-  REPORT_VERIFIED_HIGH: {t:"Verified · HIGH", cls:"high"},
-  REPORT_VERIFIED_MEDIUM: {t:"Verified · MEDIUM", cls:"medium"},
-  REPORT_VERIFIED_LOW: {t:"Verified · LOW", cls:"low"},
-  REPORT_DEBUNKED: {t:"Debunked", cls:"debunked"},
-  REPORT_INSUFFICIENT_PROOF: {t:"Insufficient Proof", cls:"insuff"},
-  REPORT_WITHDRAWN: {t:"Withdrawn", cls:"withdrawn"},
+  REPORT_PENDING:            {t:"Pending",              cls:"pending"},
+  REPORT_VERIFIED_HIGH:      {t:"Verified · HIGH",      cls:"high"},
+  REPORT_VERIFIED_MEDIUM:    {t:"Verified · MEDIUM",    cls:"medium"},
+  REPORT_VERIFIED_LOW:       {t:"Verified · LOW",       cls:"low"},
+  REPORT_DEBUNKED:           {t:"Debunked",             cls:"debunked"},
+  REPORT_INSUFFICIENT_PROOF: {t:"Insufficient Proof",   cls:"insuff"},
+  REPORT_WITHDRAWN:          {t:"Withdrawn",            cls:"withdrawn"},
 };
 
 $("l_btn").addEventListener("click", async ()=>{
   const el=$("l_status"), out=$("l_result");
-  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "TO_BE_FILLED_AFTER_DEPLOY"){
-    setStatus(el,"err","Contract address is not configured."); return;
-  }
+  if (!contractConfigured){ setStatus(el,"err","Contract address is not configured."); return; }
   try{
-    const id=$("l_id").value.trim(); if (id===""){ setStatus(el,"err","Report ID required."); return; }
+    const id=$("l_id").value.trim();
+    if (id===""){ setStatus(el,"err","Report ID required."); return; }
     setStatus(el,"work","Reading report state from contract…", true);
     const raw = await readContract("get_report",[Number(id)]);
     const d = typeof raw === "string" ? JSON.parse(raw) : raw;
     let prog = null;
-    try { prog = JSON.parse(await readContract("get_program",[Number(d.program_id)])); }
-    catch(_){}
+    try { prog = JSON.parse(await readContract("get_program",[Number(d.program_id)])); } catch(_){}
     clearStatus(el);
     out.innerHTML = renderReport(id, d, prog);
     out.scrollIntoView({behavior:"smooth", block:"start"});
+    bindCopyables(out);
   }catch(e){ setStatus(el,"err","Report not found or error: "+(e.message||e)); out.innerHTML=""; console.error(e);}
 });
 
 function renderReport(id, d, prog){
   const st = STATUS_LABEL[d.status] || { t: d.status, cls: "pending" };
-  const badgeHtml = `<span class="badge ${st.cls}">${escapeHtml(st.t)}</span>`;
+  const badgeHtml = `<span class="badge ${st.cls}"><span class="bdot"></span>${escapeHtml(st.t)}</span>`;
 
   const progHtml = prog ? `
     <div class="prog-summary">
-      <div>Program <b>#${prog.id}</b></div>
-      <div>Sponsor <b>${shortAddr(prog.sponsor)}</b></div>
-      <div>Pool balance <b>${prog.pool_balance}</b></div>
-      <div>HIGH / MED / LOW <b>${prog.high_payout} · ${prog.medium_payout} · ${prog.low_payout}</b></div>
-      <div>Scope <b><a href="${prog.scope_url}" target="_blank" rel="noopener">${escapeHtml(shortUrl(prog.scope_url))}</a></b></div>
+      <div class="p"><span class="k">Program</span><span class="v">#${prog.id}</span></div>
+      <div class="p"><span class="k">Sponsor</span><span class="v">${copyableAddr(prog.sponsor)}</span></div>
+      <div class="p"><span class="k">Pool balance</span><span class="v">${Number(prog.pool_balance).toLocaleString()}</span></div>
+      <div class="p"><span class="k">Total deposited</span><span class="v">${Number(prog.total_deposited).toLocaleString()}</span></div>
+      <div class="p"><span class="k">HIGH · MED · LOW</span><span class="v">${prog.high_payout} · ${prog.medium_payout} · ${prog.low_payout}</span></div>
+      <div class="p"><span class="k">Scope</span><span class="v"><a href="${escapeAttr(prog.scope_url)}" target="_blank" rel="noopener">${escapeHtml(shortUrl(prog.scope_url))}</a></span></div>
+      <div class="p"><span class="k">Open reports</span><span class="v">${prog.open_reports}</span></div>
+      <div class="p"><span class="k">Status</span><span class="v">${escapeHtml(prog.status)}</span></div>
     </div>` : "";
 
-  const isVerified = d.status.startsWith("REPORT_VERIFIED_");
+  const sevCls = d.severity === "HIGH" ? "hi" : d.severity === "MEDIUM" ? "med" : d.severity === "LOW" ? "lo" : "";
   const payoutBlock = `
-    <div class="payout-row">
-      <div><span>Severity</span><span>${escapeHtml(d.severity || "—")}</span></div>
-      <div><span>Payout</span><span>${d.payout_amount}</span></div>
-      <div><span>Bond</span><span>${d.bond}</span></div>
-      <div><span>Withdrawable</span><span>${d.withdrawable}</span></div>
-      <div><span>Reporter</span><span>${shortAddr(d.reporter)}</span></div>
+    <div class="grid-facts">
+      <div class="fact ${sevCls}"><span class="k">Severity</span><span class="v">${escapeHtml(d.severity || "—")}</span></div>
+      <div class="fact ok"><span class="k">Payout</span><span class="v">${Number(d.payout_amount || 0).toLocaleString()}</span></div>
+      <div class="fact"><span class="k">Bond</span><span class="v">${Number(d.bond || 0).toLocaleString()}</span></div>
+      <div class="fact"><span class="k">Withdrawable</span><span class="v">${Number(d.withdrawable || 0).toLocaleString()}</span></div>
+      <div class="fact"><span class="k">Reporter</span><span class="v">${copyableAddr(d.reporter)}</span></div>
     </div>`;
 
   const reasonBlock = d.reason ? `
     <div class="reason">
-      <div class="rl">AI Verifier Rationale</div>
+      <div class="rl">AI Verifier rationale</div>
       ${escapeHtml(d.reason)}
     </div>` : "";
 
   const injBlock = d.injection_flag ? `
-    <div class="injection">Prompt-injection detected in evidence · downgraded to INSUFFICIENT_PROOF</div>` : "";
+    <div class="injection">Prompt-injection detected in evidence · verdict downgraded to INSUFFICIENT_PROOF</div>` : "";
 
+  const evList = (d.evidence || []).map(e => `
+      <a class="ev-row" href="${escapeAttr(e.url)}" target="_blank" rel="noopener">
+        <span class="arr">→</span>
+        <span class="host">${escapeHtml(urlHost(e.url))}</span>
+        <span class="path">${escapeHtml(urlPath(e.url))}</span>
+        ${e.note ? `<span class="note">// ${escapeHtml(e.note)}</span>` : ""}
+      </a>`).join("");
   const evBlock = `
-    <div class="ev">
-      <div style="color:var(--muted-2);letter-spacing:.1em">// EVIDENCE</div>
-      ${(d.evidence || []).map(e =>
-        `<div class="ev-item">→ <a href="${e.url}" target="_blank" rel="noopener">${escapeHtml(shortUrl(e.url))}</a>${e.note ? ' · <span style="color:var(--muted-2)">'+escapeHtml(e.note)+'</span>' : ''}</div>`
-      ).join("") || '<div class="ev-item">— none —</div>'}
+    <div class="ev-block">
+      <div class="lbl">Evidence sources · re-fetched by validators</div>
+      <div class="ev-list">${evList || '<div class="empty">— none supplied —</div>'}</div>
     </div>`;
 
-  const canWithdraw = d.withdrawable > 0 && d.status !== "REPORT_WITHDRAWN";
+  const canWithdraw = Number(d.withdrawable || 0) > 0 && d.status !== "REPORT_WITHDRAWN";
   const wdBlock = canWithdraw ? `
     <div class="withdrawbtn">
-      <button class="act" data-wd="${id}">Withdraw ${d.withdrawable}</button>
-      <span class="mono" id="wd_status_${id}"></span>
+      <button class="act" data-wd="${id}">Withdraw <b>${Number(d.withdrawable).toLocaleString()}</b> wei</button>
+      <span class="wtext">Payout + bond credited to reporter. Only the reporter can call this.</span>
     </div>` : "";
+
+  const explorerLink = contractConfigured
+    ? `<a class="exp" href="${EXPLORER}/contracts/${CONTRACT_ADDRESS}" target="_blank" rel="noopener">contract</a>`
+    : "";
 
   return `<div class="verdict">
     <div class="vhead">
-      <span class="id">REPORT <b>#${id}</b> · program <b>#${d.program_id}</b></span>
-      ${badgeHtml}
+      <span class="id">
+        REPORT <b class="copyable" data-copy="${id}"><span>#${id}</span><span class="cbtn">copy</span></b>
+        · program <b>#${d.program_id}</b>
+      </span>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        ${badgeHtml}
+        ${explorerLink}
+      </div>
     </div>
     <div class="vbody">
       ${progHtml}
-      <div class="mono" style="color:var(--muted);font-size:12.5px;margin-bottom:12px">"${escapeHtml(d.summary)}"</div>
+      <div class="summary-quote">${escapeHtml(d.summary || "—")}</div>
       ${payoutBlock}
       ${reasonBlock}
       ${injBlock}
@@ -718,85 +1565,223 @@ function renderReport(id, d, prog){
   </div>`;
 }
 
+// Copyable elements
+function copyableAddr(addr){
+  if (!addr) return "—";
+  return `<span class="copyable" data-copy="${addr}" title="${addr}">
+    <span>${shortAddr(addr)}</span>
+    <span class="cbtn">copy</span>
+  </span>`;
+}
+function bindCopyables(root){
+  (root||document).querySelectorAll("[data-copy]").forEach(el => {
+    if (el._bound) return;
+    el._bound = true;
+    el.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      const val = el.dataset.copy;
+      navigator.clipboard?.writeText(val).then(()=>{
+        const btn = el.querySelector(".cbtn");
+        if (btn){ const old = btn.textContent; btn.textContent = "copied!"; setTimeout(()=>btn.textContent = old, 1200); }
+      });
+    });
+  });
+}
+
+// Withdraw handler (event-delegated)
 document.addEventListener("click", async (ev)=>{
   const btn = ev.target.closest("[data-wd]");
   if (!btn) return;
   const id = btn.dataset.wd;
-  const st = document.getElementById("wd_status_"+id);
-  if (!client || !account){ if (st) st.textContent="Connect wallet first."; return; }
+  if (!client || !account){ toast("err","Wallet required","Connect your wallet to withdraw."); return; }
   try {
-    if (st) st.textContent = "Withdrawing…";
-    const txHash = await client.writeContract({
-      address: CONTRACT_ADDRESS, functionName: "withdraw_report",
-      args: [Number(id)], value: 0n,
-    });
-    await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
-    if (st) st.textContent = "Withdrawn.";
+    await writeTx("withdraw_report", [Number(id)], 0, "Claiming payout + bond");
     $("l_id").value = id; $("l_btn").click();
-  } catch(e){ if (st) st.textContent = "Error: "+(e.message||e); console.error(e);}
+    loadStats();
+  } catch(e){ console.error(e); }
 });
 
-// ── Recent list ──────────────────────────────────────────────────
-async function loadRecent(){
-  const el=$("rc_status"), list=$("rc_list");
-  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "TO_BE_FILLED_AFTER_DEPLOY"){
-    setStatus(el,"err","Contract address is not configured."); return;
+// ── Stats strip ───────────────────────────────────────────────────
+let allReports = []; // cached for filters
+let allPrograms = [];
+
+async function loadStats(){
+  if (!contractConfigured){
+    ["s_programs","s_reports","s_locked","s_verified","s_debunked"].forEach(i => $(i).textContent = "—");
+    return;
   }
   try {
-    setStatus(el,"work","Reading recent reports from the contract…", true);
     const totalsRaw = await readContract("get_totals", []);
     const totals = typeof totalsRaw === "string" ? JSON.parse(totalsRaw) : totalsRaw;
-    $("k_progs").textContent = totals.programs;
-    $("k_reports").textContent = totals.reports;
+    $("s_programs").textContent = totals.programs;
+    $("s_reports").textContent = totals.reports;
 
-    if (totals.reports === 0){
-      clearStatus(el);
-      list.innerHTML = '<p class="empty">No reports on this contract yet. Fund a program, then submit one.</p>';
+    // Fetch all programs (small dataset) for locked amount
+    const progFetches = [];
+    for (let i = 0; i < totals.programs; i++) progFetches.push(safeRead("get_program", [i]));
+    const progs = (await Promise.all(progFetches)).filter(Boolean);
+    allPrograms = progs;
+    const locked = progs.reduce((s,p) => s + Number(p.pool_balance || 0), 0);
+    $("s_locked").textContent = locked.toLocaleString();
+
+    // Fetch all reports
+    const repFetches = [];
+    for (let i = 0; i < totals.reports; i++) repFetches.push(safeRead("get_report", [i]));
+    const reps = (await Promise.all(repFetches)).filter(Boolean);
+    allReports = reps;
+    const verified = reps.filter(r => (r.status||"").startsWith("REPORT_VERIFIED_")).length;
+    const debunked = reps.filter(r => r.status === "REPORT_DEBUNKED").length;
+    $("s_verified").textContent = verified;
+    $("s_debunked").textContent = debunked;
+
+    ["s_programs","s_reports","s_locked","s_verified","s_debunked"].forEach(i => {
+      $(i).parentElement.classList.remove("loading");
+    });
+  } catch (e) {
+    console.error("stats:", e);
+  }
+}
+async function safeRead(method, args){
+  try {
+    const raw = await readContract(method, args);
+    return typeof raw === "string" ? JSON.parse(raw) : raw;
+  } catch { return null; }
+}
+
+// ── Recent list ──────────────────────────────────────────────────
+function renderRecent(){
+  const list = $("rc_list");
+  const fStatus = $("f_status").value;
+  const fSev = $("f_sev").value;
+  const fSort = $("f_sort").value;
+  const q = $("f_q").value.trim().toLowerCase();
+
+  let items = allReports.map((d, idx) => ({ id: idx, d })).filter(r => r.d);
+
+  if (fStatus !== "all") {
+    items = items.filter(r => {
+      const s = r.d.status || "";
+      if (fStatus === "pending")   return s === "REPORT_PENDING";
+      if (fStatus === "verified")  return s.startsWith("REPORT_VERIFIED_");
+      if (fStatus === "debunked")  return s === "REPORT_DEBUNKED";
+      if (fStatus === "insuff")    return s === "REPORT_INSUFFICIENT_PROOF";
+      if (fStatus === "withdrawn") return s === "REPORT_WITHDRAWN";
+      return true;
+    });
+  }
+  if (fSev !== "all") items = items.filter(r => (r.d.severity || "") === fSev);
+  if (q) items = items.filter(r => {
+    const d = r.d;
+    return (d.summary||"").toLowerCase().includes(q)
+        || (d.reason||"").toLowerCase().includes(q)
+        || (d.reporter||"").toLowerCase().includes(q);
+  });
+
+  if (fSort === "oldest") items.sort((a,b)=>a.id-b.id);
+  else if (fSort === "payout") items.sort((a,b)=>Number(b.d.payout_amount||0) - Number(a.d.payout_amount||0));
+  else items.sort((a,b)=>b.id-a.id);
+
+  if (items.length === 0){
+    list.innerHTML = `<div class="empty"><div class="em-icon">◇</div>No reports match the current filters.<br><span style="color:var(--muted-2);font-size:12px">Try widening the status/severity filters, or clear the search box.</span></div>`;
+    return;
+  }
+  list.innerHTML = items.map(r => renderRow(r.id, r.d)).join("");
+  list.querySelectorAll("[data-open]").forEach(row => {
+    row.addEventListener("click", (e) => {
+      if (e.target.closest("a") || e.target.closest("[data-copy]")) return;
+      document.querySelector('nav.tabs button[data-tab="convene"]').click();
+      $("l_id").value = row.dataset.open;
+      $("l_btn").click();
+    });
+  });
+  bindCopyables(list);
+}
+
+function renderRow(id, d){
+  const st = STATUS_LABEL[d.status] || { t: d.status, cls: "pending" };
+  const summary = d.summary ? (d.summary.length > 200 ? d.summary.slice(0,200)+"…" : d.summary) : "";
+  const reasonShort = d.reason ? (d.reason.length > 220 ? d.reason.slice(0,220)+"…" : d.reason) : "";
+  const evChips = (d.evidence || []).slice(0,4).map(e => `
+    <a class="ev-chip" href="${escapeAttr(e.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+      <span class="arrow">→</span>
+      <span class="host">${escapeHtml(urlHost(e.url))}</span>
+      <span class="path">${escapeHtml(urlPathShort(e.url))}</span>
+    </a>`).join("");
+  const evMore = (d.evidence || []).length > 4 ? `<span class="ev-chip">+${d.evidence.length - 4} more</span>` : "";
+  const payoutTag = Number(d.payout_amount||0) > 0
+    ? `<span class="payout">payout <b>${Number(d.payout_amount).toLocaleString()}</b></span>`
+    : `<span class="payout zero">payout —</span>`;
+  const sevBadge = d.severity && d.severity !== "" ? `<span class="sevtag ${sevCls(d.severity)}">${d.severity}</span>` : "";
+  const injMark = d.injection_flag ? `<span class="badge high" style="padding:2px 7px;font-size:9.5px">⚠ INJECTION</span>` : "";
+  return `
+  <div class="rrow ${st.cls}" data-open="${id}">
+    <div class="head">
+      <div class="idblock">
+        <div class="idline">
+          <span class="rid">REPORT #${id}</span>
+          <span class="pid">· program #${d.program_id}</span>
+          ${sevBadge}
+          ${injMark}
+        </div>
+        <div class="metaline">
+          <span><span class="k">reporter</span> <span class="v mono">${copyableAddr(d.reporter)}</span></span>
+          <span><span class="k">bond</span> <span class="v">${Number(d.bond||0).toLocaleString()}</span></span>
+        </div>
+      </div>
+      <span class="badge ${st.cls}"><span class="bdot"></span>${escapeHtml(st.t)}</span>
+    </div>
+    ${summary ? `<div class="summary">${escapeHtml(summary)}</div>` : ""}
+    ${reasonShort ? `<div class="reason-preview">${escapeHtml(reasonShort)}</div>` : ""}
+    ${evChips ? `<div class="ev-chips">${evChips}${evMore}</div>` : ""}
+    <div class="rowfoot">
+      <span>${(d.evidence||[]).length} evidence source${(d.evidence||[]).length===1?"":"s"}</span>
+      ${payoutTag}
+    </div>
+  </div>`;
+}
+
+function sevCls(sev){
+  return ({HIGH:"high",MEDIUM:"medium",LOW:"low",DEBUNKED:"debunked",INSUFFICIENT_PROOF:"insuff"})[sev] || "";
+}
+
+async function loadRecent(){
+  const el=$("rc_status"), list=$("rc_list");
+  if (!contractConfigured){ setStatus(el,"err","Contract address is not configured."); return; }
+  try {
+    setStatus(el,"work","Reading recent reports from the contract…", true);
+    list.innerHTML = `<div class="skeleton"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>`;
+    await loadStats();
+    clearStatus(el);
+    if (allReports.length === 0){
+      list.innerHTML = `<div class="empty"><div class="em-icon">◇</div>No reports on this contract yet.<br><span style="color:var(--muted-2);font-size:12px">Fund a program, then submit one.</span></div>`;
       return;
     }
-    const ids = [];
-    for (let i = totals.reports - 1; i >= Math.max(0, totals.reports - 12); i--) ids.push(i);
-    const rows = await Promise.all(ids.map(async i => {
-      try {
-        const raw = await readContract("get_report",[i]);
-        const d = typeof raw === "string" ? JSON.parse(raw) : raw;
-        return { id: i, d };
-      } catch(e){ return { id: i, err: e.message || String(e) }; }
-    }));
-    clearStatus(el);
-    list.innerHTML = rows.map(r => {
-      if (r.err) return `<div class="rrow"><div class="head"><span class="idlabel">REPORT <b>#${r.id}</b></span><span class="badge withdrawn">error</span></div><div class="reason">${escapeHtml(r.err).slice(0,120)}</div></div>`;
-      const d = r.d;
-      const st = STATUS_LABEL[d.status] || { t: d.status, cls: "pending" };
-      const short = d.summary ? d.summary.slice(0, 140) + (d.summary.length > 140 ? "…" : "") : "";
-      const reasonShort = d.reason ? d.reason.slice(0, 200) + (d.reason.length > 200 ? "…" : "") : "";
-      return `<div class="rrow" data-open="${r.id}">
-        <div class="head">
-          <span class="idlabel">REPORT <b>#${r.id}</b> · program <b>#${d.program_id}</b> · bond <b>${d.bond}</b>${d.payout_amount ? ' · payout <b>'+d.payout_amount+'</b>' : ''}</span>
-          <span class="badge ${st.cls}">${escapeHtml(st.t)}</span>
-        </div>
-        <div class="reason">${escapeHtml(short)}</div>
-        ${reasonShort ? `<div class="reason" style="color:var(--muted-2);font-family:'JetBrains Mono',monospace;font-size:11.5px">// ${escapeHtml(reasonShort)}</div>` : ""}
-      </div>`;
-    }).join("");
-    // Click rows to open verdict in the Convene tab
-    list.querySelectorAll("[data-open]").forEach(r => {
-      r.addEventListener("click", () => {
-        document.querySelector('nav.tabs button[data-tab="convene"]').click();
-        $("l_id").value = r.dataset.open;
-        $("l_btn").click();
-      });
-    });
+    renderRecent();
   } catch(e){ setStatus(el,"err","Error loading list: "+(e.message||e)); console.error(e);}
 }
 $("rc_btn").addEventListener("click", loadRecent);
+["f_status","f_sev","f_sort","f_q"].forEach(id => $(id).addEventListener("input", renderRecent));
 
-// Auto-load Recent Reports on first render so a wallet-less visitor sees something.
+// Auto-load stats + recent so wallet-less visitors see rich content immediately.
 loadRecent().catch(()=>{});
 
-function shortUrl(u){ try { const x = new URL(u); return x.hostname + (x.pathname.length > 16 ? x.pathname.slice(0, 16) + "…" : x.pathname); } catch { return String(u).slice(0, 32); } }
+// ── Utils ────────────────────────────────────────────────────────
 function shortAddr(a){ return a ? a.slice(0, 6) + "…" + a.slice(-4) : "—"; }
-function escapeHtml(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function urlHost(u){ try { return new URL(u).hostname.replace(/^www\./,""); } catch { return String(u).slice(0,20); } }
+function urlPath(u){ try { const x = new URL(u); return x.pathname + (x.search||""); } catch { return ""; } }
+function urlPathShort(u){
+  try {
+    const x = new URL(u);
+    const seg = x.pathname.split("/").filter(Boolean)[0] || "";
+    return seg ? "/" + seg + (x.pathname.split("/").length > 2 ? "/…" : "") : "/";
+  } catch { return ""; }
+}
+function shortUrl(u){ try { const x = new URL(u); return x.hostname + (x.pathname.length > 22 ? x.pathname.slice(0, 22) + "…" : x.pathname); } catch { return String(u).slice(0, 32); } }
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+// Kick off initial validation state
+validateAll();
 </script>
 </body>
 </html>
