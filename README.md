@@ -87,13 +87,16 @@ VITE_CONTRACT_ADDRESS=0x<your contract> npm run dev
 
 Open the app in a browser with MetaMask installed. **Connect Wallet** — the app runs `wallet_switchEthereumChain` (falls back to `wallet_addEthereumChain`) so MetaMask lands on studionet before any signed tx.
 
-The UI has three tabs, built so a first-time user never has to copy a raw contract ID by hand:
+The UI is a hash-routed SPA — each view is its own URL, so a first-time user never has to copy a raw ID by hand:
 
-- **Explore** (landing) — a live catalog of every **bounty Program** (card per program: scope, pool, payout schedule, report count) *and* every **Report**. Pick a program and hit **Submit a report** → the Submit form opens with the Program ID and minimum bond pre-filled. Every report card has **View verdict** (opens the full AI-Jury detail) and, when pending, **Convene AI Verifier** right on the card. No IDs to type.
-- **Create Program** — fund a pool and lock the schedule. On success a **persistent share panel** shows the new **Program ID** big and copyable, plus a one-click **shareable link** (`?program=<id>`) to hand to researchers.
-- **Submit Report** — pre-filled when reached from Explore; program preview shown inline.
+| Route | View |
+|---|---|
+| `#/explorer` | **Explorer** (landing) — live catalog of every **bounty Program** (scope, pool, schedule, report count) *and* every **Report** (resolved verdicts with severity, payout, AI rationale, consensus). Wallet-less. |
+| `#/create` | **Create Program** — fund a pool, lock the schedule. On success a **persistent share panel** shows the new **Program ID** big + copyable with a one-click share link. |
+| `#/submit` / `#/submit/:programId` | **Submit Report** — pre-filled Program ID + minimum bond when reached from a program card or share link. |
+| `#/report/:id` | Permalink to a single **resolved case** — opens the full AI-Jury verdict. |
 
-**Shareable deep links:** `?program=<id>` opens the app straight on the Submit flow for that program; `?report=<id>` opens that report's verdict. Explore uses a **wallet-less read client**, so anyone can browse programs and verdicts without connecting.
+Every report card carries **View verdict** and, when pending, **Convene AI Verifier** inline — no IDs to type. Program cards have **Submit a report** (routes to `#/submit/:id` with the ID pre-filled) and **Share**. Legacy `?program=<id>` / `?report=<id>` query links are auto-migrated to the equivalent hash route. The Explorer reads through a **wallet-less client**, so anyone can browse programs and verdicts without connecting.
 
 **Deploying live** (Vercel): point the project at the `frontend/` directory, set `VITE_CONTRACT_ADDRESS` and `VITE_CHAIN=studio` as environment variables, and build.
 

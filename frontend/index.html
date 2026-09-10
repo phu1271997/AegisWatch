@@ -962,7 +962,7 @@
 
   <!-- ── TABS ────────────────────────────────────────────────── -->
   <nav class="tabs">
-    <button class="active" data-tab="explore"><span class="tabnum">01 ·</span> Explore</button>
+    <button class="active" data-tab="explore"><span class="tabnum">01 ·</span> Explorer</button>
     <button data-tab="fund"><span class="tabnum">02 ·</span> Create Program</button>
     <button data-tab="submit"><span class="tabnum">03 ·</span> Submit Report</button>
   </nav>
@@ -1426,7 +1426,20 @@ async function readContract(method, args){
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────
-function switchTab(name){
+// ── Hash router ──────────────────────────────────────────────────
+// Real URL routes so each view is its own address (and every resolved
+// case has a shareable permalink). Hash-based → no server rewrite needed
+// on static hosting.
+//   #/explorer            catalog of programs + resolved cases
+//   #/create              create a bounty program
+//   #/submit  #/submit/:pid   file a report (optionally pre-targeted)
+//   #/report/:id          a single case (opens the verdict)
+const TAB_ROUTE = { explore:"explorer", fund:"create", submit:"submit" };
+const ROUTE_TAB = { explorer:"explore", explore:"explore", history:"explore",
+                    create:"fund", fund:"fund", submit:"submit", report:"explore", program:"submit" };
+
+// Pure view swap — no navigation side effects.
+function showTab(name){
   document.querySelectorAll("nav.tabs button").forEach(x=>{
     x.classList.toggle("active", x.dataset.tab === name);
   });
@@ -1435,13 +1448,41 @@ function switchTab(name){
   if (panel) panel.classList.add("active");
   if (name === "explore") loadExplore();
   if (name === "submit") tryPreviewProgram();
-  window.scrollTo({top:0, behavior:"smooth"});
 }
+
+function parseHash(){
+  return location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+}
+function applyRoute(){
+  const seg = parseHash();
+  const head = (seg[0] || "explorer").toLowerCase();
+  const arg = seg[1];
+  const tab = ROUTE_TAB[head] || "explore";
+  showTab(tab);
+  if (head === "report" && arg != null && arg !== ""){
+    openDetail(arg);
+  } else if ((head === "submit" || head === "program") && arg != null && arg !== ""){
+    fillReportForm(arg);
+    window.scrollTo({top:0, behavior:"smooth"});
+  } else {
+    closeDetail();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+}
+// Navigate = change the URL; hashchange drives the render (idempotent).
+function navigate(route){
+  const h = "#/" + String(route).replace(/^\/+/, "");
+  if (location.hash === h) applyRoute();
+  else location.hash = h;
+}
+// Back-compat alias for existing callers.
+function switchTab(name){ navigate(TAB_ROUTE[name] || "explorer"); }
+
 document.querySelectorAll("nav.tabs button").forEach(b=>{
-  b.addEventListener("click",()=>switchTab(b.dataset.tab));
+  b.addEventListener("click",()=>navigate(TAB_ROUTE[b.dataset.tab] || "explorer"));
 });
-$("pl_new").addEventListener("click", ()=>switchTab("fund"));
-$("r_browse").addEventListener("click", (e)=>{ e.preventDefault(); switchTab("explore"); });
+$("pl_new").addEventListener("click", ()=>navigate("create"));
+$("r_browse").addEventListener("click", (e)=>{ e.preventDefault(); navigate("explorer"); });
 
 // ── Validation ────────────────────────────────────────────────────
 const URL_RE = /^https?:\/\/\S+$/i;
@@ -1541,7 +1582,7 @@ $("p_btn").addEventListener("click", async ()=>{
 
 // Persistent share panel — the Program ID is the thing a sponsor must hand out.
 function programShareLink(pid){
-  return location.origin + location.pathname + "?program=" + pid;
+  return location.origin + location.pathname + "#/submit/" + pid;
 }
 function showSharePanel(pid){
   const panel = $("sharePanel");
@@ -1591,8 +1632,7 @@ $("r_btn").addEventListener("click", async ()=>{
     validateAll();
     loadStats();
     await loadPrograms();
-    switchTab("explore");
-    setTimeout(()=>openDetail(rid), 250);
+    navigate("report/" + rid);
   }catch(e){ console.error(e); }
 });
 
@@ -1621,7 +1661,7 @@ async function conveneReport(id){
     t.update("ok","Verdict finalized","AI Jury reached consensus on report #"+id,{tx:txHash});
     await loadStats();
     await loadPrograms();
-    openDetail(id);
+    navigate("report/" + id);
   } catch (e) {
     t.update("err","Verifier failed", String(e.message||e), txHash ? {tx:txHash} : {});
     console.error(e);
@@ -1775,7 +1815,7 @@ document.addEventListener("click", async (ev)=>{
     await writeTx("withdraw_report", [Number(id)], 0, "Claiming payout + bond");
     await loadStats();
     await loadPrograms();
-    openDetail(id);
+    navigate("report/" + id);
   } catch(e){ console.error(e); }
 });
 
@@ -1790,25 +1830,26 @@ document.addEventListener("click", (ev)=>{
 // View / program-card actions (event-delegated)
 document.addEventListener("click", (ev)=>{
   const view = ev.target.closest("[data-view]");
-  if (view){ ev.stopPropagation(); openDetail(view.dataset.view); return; }
+  if (view){ ev.stopPropagation(); navigate("report/" + view.dataset.view); return; }
   const submit = ev.target.closest("[data-submitprog]");
-  if (submit){ ev.stopPropagation(); startReportFor(submit.dataset.submitprog); return; }
+  if (submit){ ev.stopPropagation(); navigate("submit/" + submit.dataset.submitprog); return; }
   const share = ev.target.closest("[data-shareprog]");
   if (share){ ev.stopPropagation(); shareProgram(share.dataset.shareprog); return; }
   const seereps = ev.target.closest("[data-progreports]");
   if (seereps){ ev.stopPropagation(); filterReportsByProgram(seereps.dataset.progreports); return; }
 });
 
-// Pre-fill the Submit tab for a chosen program — no manual ID copying.
-function startReportFor(pid){
-  switchTab("submit");
+// Pre-fill the Submit form for a chosen program — no manual ID copying.
+// Pure: the router already switched to the submit view before calling this.
+function fillReportForm(pid){
   $("r_pid").value = String(pid);
   const p = allPrograms.find(x => String(x.id) === String(pid));
-  if (p && Number(p.min_bond) > 0) $("r_bond").value = String(p.min_bond);
+  if (p && Number(p.min_bond) > 0 && !$("r_bond").value) $("r_bond").value = String(p.min_bond);
   tryPreviewProgram();
   validateAll();
   setTimeout(()=>$("r_summary").focus(), 200);
 }
+function startReportFor(pid){ navigate("submit/" + pid); }
 function shareProgram(pid){
   const link = programShareLink(pid);
   navigator.clipboard?.writeText(link).then(
@@ -2083,24 +2124,18 @@ async function loadExplore(){
   exploreLoaded = true;
 }
 
-// ── Deep links: ?program=<id> / ?report=<id> ─────────────────────
-async function handleDeepLink(){
+// ── Boot the router ──────────────────────────────────────────────
+window.addEventListener("hashchange", applyRoute);
+(function init(){
+  // Migrate legacy query deep links (?program= / ?report=) to hash routes.
   const params = new URLSearchParams(location.search);
   const rep = params.get("report");
   const prog = params.get("program");
-  if (rep !== null && rep !== ""){
-    switchTab("explore");
-    setTimeout(()=>openDetail(rep), 400);
-  } else if (prog !== null && prog !== ""){
-    switchTab("explore");
-    setTimeout(()=>{ startReportFor(prog); }, 300);
-  }
-}
-
-// Auto-load so wallet-less visitors see the full catalog immediately.
-(async function init(){
-  await loadExplore().catch(()=>{});
-  handleDeepLink().catch(()=>{});
+  let target = location.hash || "#/explorer";
+  if (rep !== null && rep !== "") target = "#/report/" + rep;
+  else if (prog !== null && prog !== "") target = "#/submit/" + prog;
+  history.replaceState(null, "", location.pathname + target);
+  applyRoute();   // renders the view + kicks off loadExplore()
 })();
 
 // ── Utils ────────────────────────────────────────────────────────

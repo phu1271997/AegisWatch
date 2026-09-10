@@ -2,6 +2,17 @@
 
 Follows [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-09-10
+
+### Added — client-side routing (Explorer review feedback)
+- **Hash router.** Each view is now its own address: `#/explorer` (catalog of programs + resolved cases), `#/create`, `#/submit` / `#/submit/:programId` (pre-targeted), and `#/report/:id` (permalink to a single resolved case). Unknown routes fall back to `#/explorer`; the browser back/forward buttons work.
+- **Dedicated Explorer route** for resolved cases — surfaces every verdict (severity, payout, AI rationale, consensus) at a stable URL, wallet-less, as the judge requested.
+- **Resolved-case permalinks:** convening, withdrawing, and filing a report all land on `#/report/:id`, so a verdict is a shareable link.
+
+### Changed
+- Program share links now use `#/submit/:id`; legacy `?program=` / `?report=` query links are auto-migrated to the equivalent hash route on load.
+- Report/program card actions and internal navigation go through the router (single source of truth for the active view).
+
 ## [1.1.0] — 2026-09-10
 
 ### Changed — usability overhaul (judge feedback)
