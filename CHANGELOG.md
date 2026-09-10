@@ -2,6 +2,15 @@
 
 Follows [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-09-10
+
+### Changed — usability overhaul (judge feedback)
+- **Program Explorer** replaces the old tab layout. New landing tab **Explore** shows a live card catalog of every bounty Program (scope, pool, payout schedule, report count) alongside the Reports list. A reporter picks a program and clicks **Submit a report** — the Program ID and minimum bond pre-fill automatically. No more copying a raw ID by hand.
+- **Persistent share panel** after `create_program`: the new **Program ID** is shown large and copyable with a one-click **shareable link** (`?program=<id>`), so a sponsor can hand it to researchers immediately (previous build only flashed the ID in a transient toast).
+- **Report ID abstracted away.** Each report card carries inline **View verdict** and, when pending, **Convene AI Verifier** actions; the full verdict opens in a detail modal. The dedicated "Convene Verifier" and "Lookup by Report ID" tabs are gone.
+- **Shareable deep links**: `?program=<id>` opens the Submit flow for that program; `?report=<id>` opens that report's verdict — friendlier for non-crypto ("zk") users arriving from a link.
+- Reports list gains a **program filter**; program cards link straight to their own reports.
+
 ## [1.0.0] — 2026-09-07
 
 ### Added

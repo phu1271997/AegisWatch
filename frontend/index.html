@@ -791,6 +791,124 @@
     .hero{padding:var(--s-5) var(--s-5) var(--s-5)}
     .toaster{max-width:calc(100vw - 40px);right:10px;top:10px}
   }
+
+  /* ─────────────────────────────────────────────────────────────
+     SECTION HEADERS inside a panel
+     ───────────────────────────────────────────────────────────── */
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s-4);flex-wrap:wrap;
+    margin:var(--s-6) 0 var(--s-3);
+  }
+  .section-head .st{display:flex;flex-direction:column;gap:4px}
+  .section-head h2{
+    font-family:var(--font-sans);font-weight:600;font-size:18px;letter-spacing:-.01em;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section-head h2::before{
+    content:"";width:9px;height:9px;border-radius:2px;background:var(--accent);
+    box-shadow:0 0 10px rgba(94,234,212,.6);
+  }
+  .section-head .sd{font-size:13px;color:var(--muted);max-width:640px}
+  .section-head.rep h2::before{background:var(--sev-insuff);box-shadow:0 0 10px rgba(142,163,212,.5)}
+
+  /* ─────────────────────────────────────────────────────────────
+     PROGRAM EXPLORER GRID
+     ───────────────────────────────────────────────────────────── */
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--s-4);margin-top:var(--s-3)}
+  @media(max-width:520px){.pgrid{grid-template-columns:1fr}}
+  .pcard{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:var(--s-5);display:flex;flex-direction:column;gap:var(--s-3);position:relative;
+    transition:border-color var(--dur-2) var(--ease),transform var(--dur-1) var(--ease);
+  }
+  .pcard:hover{border-color:var(--line-3);transform:translateY(-1px)}
+  .pcard.closed{opacity:.72}
+  .pcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s-3)}
+  .pcard .pidwrap{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .pcard .pidbig{
+    font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--accent);
+    display:inline-flex;align-items:center;gap:10px;letter-spacing:-.01em;
+  }
+  .pcard .pidbig .cbtn{
+    font-size:10px;color:var(--muted-2);border:1px solid var(--line-2);
+    padding:2px 7px;border-radius:2px;cursor:pointer;letter-spacing:.06em;font-weight:400;
+  }
+  .pcard .pidbig .cbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .pcard .pscope{
+    font-family:var(--font-sans);font-size:13.5px;color:var(--text-2);line-height:1.5;
+  }
+  .pcard .pscope-url{font-family:var(--font-mono);font-size:11px;color:var(--muted);word-break:break-all}
+  .pcard .pfacts{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;
+  }
+  .pcard .pf{background:var(--bg-2);padding:var(--s-3);display:flex;flex-direction:column;gap:3px}
+  .pcard .pf .k{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+  .pcard .pf .v{font-family:var(--font-mono);font-size:13px;color:var(--text);font-weight:600}
+  .pcard .psched{
+    display:flex;gap:6px;flex-wrap:wrap;font-family:var(--font-mono);font-size:10.5px;
+  }
+  .pcard .pactions{display:flex;gap:var(--s-3);flex-wrap:wrap;margin-top:var(--s-2)}
+  .pcard .pactions button{
+    flex:1;min-width:130px;margin-top:0;padding:10px 14px;font-size:11px;justify-content:center;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     SHARE PANEL (after program creation)
+     ───────────────────────────────────────────────────────────── */
+  .sharepanel{
+    display:none;margin-top:var(--s-5);padding:var(--s-5) var(--s-6);
+    background:linear-gradient(135deg,rgba(94,234,212,.10),rgba(94,234,212,.03));
+    border:1px solid rgba(94,234,212,.35);border-radius:var(--r-md);
+    box-shadow:var(--shadow-glow);
+  }
+  .sharepanel.show{display:block;animation:fadeIn .25s var(--ease)}
+  .sharepanel .sptitle{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px;
+  }
+  .sharepanel .sptitle::before{content:"✓";font-weight:700}
+  .sharepanel .spid{
+    font-family:var(--font-mono);font-size:30px;font-weight:700;color:var(--text);
+    letter-spacing:-.01em;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .sharepanel .spid .lbl{font-size:13px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase}
+  .sharepanel .sprow{
+    display:flex;gap:10px;align-items:center;margin-top:var(--s-4);flex-wrap:wrap;
+    background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:8px 10px;
+  }
+  .sharepanel .sprow input{
+    flex:1;min-width:200px;background:transparent;border:none;padding:4px 2px;font-size:12px;color:var(--text-2);
+  }
+  .sharepanel .sprow input:focus{box-shadow:none;background:transparent}
+  .sharepanel .sprow button{
+    margin-top:0;padding:8px 14px;font-size:10.5px;white-space:nowrap;
+  }
+  .sharepanel .sphint{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+  /* Inline action buttons on report rows */
+  .rrow .rowactions{
+    display:flex;gap:var(--s-3);flex-wrap:wrap;margin-top:var(--s-2);
+  }
+  .rrow .rowactions button{
+    margin-top:0;padding:8px 14px;font-size:10.5px;
+  }
+  .mini-btn{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+    background:var(--accent);color:#0a0f0d;border:none;padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;
+    transition:background var(--dur-1) var(--ease);display:inline-flex;align-items:center;gap:7px;
+  }
+  .mini-btn:hover{background:var(--accent-2)}
+  .mini-btn.ghost{background:transparent;border:1px solid var(--line-2);color:var(--text)}
+  .mini-btn.ghost:hover{border-color:var(--accent);color:var(--accent);background:rgba(94,234,212,.05)}
+  .mini-btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* Detail modal — wider than the how-it-works modal */
+  .modal.wide{max-width:820px}
+  .modal .modal-body.flush{padding:var(--s-4) var(--s-5) var(--s-6)}
+
+  /* Empty program state */
+  .empty.small{padding:var(--s-6) var(--s-5)}
 </style>
 </head>
 <body>
@@ -844,14 +962,82 @@
 
   <!-- ── TABS ────────────────────────────────────────────────── -->
   <nav class="tabs">
-    <button class="active" data-tab="fund"><span class="tabnum">01 ·</span> Fund Program</button>
-    <button data-tab="submit"><span class="tabnum">02 ·</span> Submit Report</button>
-    <button data-tab="convene"><span class="tabnum">03 ·</span> Convene Verifier</button>
-    <button data-tab="recent"><span class="tabnum">04 ·</span> Recent Reports</button>
+    <button class="active" data-tab="explore"><span class="tabnum">01 ·</span> Explore</button>
+    <button data-tab="fund"><span class="tabnum">02 ·</span> Create Program</button>
+    <button data-tab="submit"><span class="tabnum">03 ·</span> Submit Report</button>
   </nav>
 
-  <!-- ── TAB 1: Fund Program ─────────────────────────────────── -->
-  <div class="panel active" id="tab-fund">
+  <!-- ── TAB 1: Explore (programs + reports) ─────────────────── -->
+  <div class="panel active" id="tab-explore">
+
+    <!-- Programs catalog -->
+    <div class="section-head">
+      <div class="st">
+        <h2>Bounty Programs</h2>
+        <div class="sd">Every open bounty on this contract. Pick one and file a report — no need to copy an ID by hand. Share a program's link so researchers land straight on it.</div>
+      </div>
+      <div class="actrow" style="margin-top:0">
+        <button class="act ghost" id="pl_refresh">Refresh</button>
+        <button class="act" id="pl_new">+ Create a Program</button>
+      </div>
+    </div>
+    <div class="status" id="pl_status"></div>
+    <div id="pl_grid" class="pgrid"></div>
+
+    <!-- Reports catalog -->
+    <div class="section-head rep" style="margin-top:var(--s-8)">
+      <div class="st">
+        <h2>Reports</h2>
+        <div class="sd">Live from the chain. Open any report to read the AI Jury verdict — or convene the verifier on a pending one right from its card. No report IDs to type.</div>
+      </div>
+      <div class="actrow" style="margin-top:0">
+        <button class="act ghost" id="rc_btn">Refresh</button>
+      </div>
+    </div>
+
+    <div class="filterbar">
+      <label>Program
+        <select id="f_prog"><option value="all">All programs</option></select>
+      </label>
+      <label>Status
+        <select id="f_status">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Verified (any tier)</option>
+          <option value="debunked">Debunked</option>
+          <option value="insuff">Insufficient proof</option>
+          <option value="withdrawn">Withdrawn</option>
+        </select>
+      </label>
+      <label>Severity
+        <select id="f_sev">
+          <option value="all">All</option>
+          <option value="HIGH">HIGH</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="LOW">LOW</option>
+          <option value="DEBUNKED">DEBUNKED</option>
+          <option value="INSUFFICIENT_PROOF">INSUFF</option>
+        </select>
+      </label>
+      <label>Sort
+        <select id="f_sort">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="payout">Highest payout</option>
+        </select>
+      </label>
+      <div class="search">
+        <label style="margin-bottom:4px">Search</label>
+        <input id="f_q" type="text" placeholder="text in summary / reason / reporter" />
+      </div>
+    </div>
+
+    <div class="status" id="rc_status"></div>
+    <div id="rc_list" class="rlist"></div>
+  </div>
+
+  <!-- ── TAB 2: Create Program ───────────────────────────────── -->
+  <div class="panel" id="tab-fund">
     <div class="card">
       <div class="card-head">
         <div>
@@ -908,6 +1094,22 @@
       </div>
       <div class="status" id="p_status"></div>
       <p class="note">// The pool balance is enforced on-chain: no verdict can pay more than the schedule, and no payout exceeds the remaining pool.</p>
+
+      <!-- Persistent success / share panel -->
+      <div class="sharepanel" id="sharePanel">
+        <div class="sptitle">Program created</div>
+        <div class="spid"><span class="lbl">Program ID</span><span id="sp_id">#—</span></div>
+        <div class="sprow">
+          <input id="sp_link" readonly value="" aria-label="Shareable program link" />
+          <button class="act" id="sp_copyLink">Copy link</button>
+          <button class="act ghost" id="sp_copyId">Copy ID</button>
+        </div>
+        <div class="sphint">Share this link with researchers — it opens AegisWatch straight on this program, ready to receive reports. The Program ID above is also all a reporter needs on the Submit tab.</div>
+        <div class="actrow">
+          <button class="act ghost" id="sp_view">View in Explorer</button>
+          <button class="act ghost" id="sp_another">Create another</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -917,7 +1119,7 @@
       <div class="card-head">
         <div>
           <h3>File a Bounty Report</h3>
-          <p class="sub">Attach a bond &ge; the program minimum. On any verified severity, your bond returns with the payout. On DEBUNKED, the bond is forfeited to the pool.</p>
+          <p class="sub">Attach a bond &ge; the program minimum. On any verified severity, your bond returns with the payout. On DEBUNKED, the bond is forfeited to the pool. Not sure which program? <a href="#" id="r_browse">Browse the Explorer</a> and hit “Submit a report” on any card — the Program ID fills in for you.</p>
         </div>
         <div class="card-est mono" id="r_est">Bond: <b>—</b></div>
       </div>
@@ -954,95 +1156,6 @@ https://github.com/org/repo/pull/1234"></textarea>
     </div>
   </div>
 
-  <!-- ── TAB 3: Convene Verifier ─────────────────────────────── -->
-  <div class="panel" id="tab-convene">
-    <div class="card">
-      <h3>Convene the AI Verifier</h3>
-      <p class="sub">Fires the on-chain nondet block: every validator fetches your evidence URLs, runs a security-triage prompt, and votes. Consensus lands when severity matches within one tier and injection flags agree. May take 1–3 minutes.</p>
-
-      <div class="row">
-        <div>
-          <label>Report ID <span class="req">*</span></label>
-          <input id="v_id" type="number" min="0" placeholder="0" />
-        </div>
-      </div>
-      <div class="actrow">
-        <button class="act" id="v_btn">Request AI Triage</button>
-        <span class="mono" style="font-size:11px;color:var(--muted-2)">no value sent · gas only</span>
-      </div>
-      <div class="status" id="v_status"></div>
-      <p class="note">// Verdict returns: severity · payout · reason · injection_flag. Anyone can convene a pending report — the verdict is deterministic once evidence is public.</p>
-    </div>
-
-    <div class="card">
-      <h3>Lookup a Report</h3>
-      <p class="sub">Read the current state and full verdict directly from the contract. Wallet not required.</p>
-      <div class="row">
-        <div>
-          <label>Report ID</label>
-          <input id="l_id" type="number" min="0" placeholder="0" />
-        </div>
-      </div>
-      <div class="actrow">
-        <button class="act ghost" id="l_btn">Fetch Verdict</button>
-      </div>
-      <div class="status" id="l_status"></div>
-      <div id="l_result"></div>
-    </div>
-  </div>
-
-  <!-- ── TAB 4: Recent Reports (public read) ─────────────────── -->
-  <div class="panel" id="tab-recent">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h3>Recent Reports</h3>
-          <p class="sub">Every report filed on this contract, sourced live from the chain. No wallet needed — this reads through a public read-only client.</p>
-        </div>
-        <div class="actrow" style="margin-top:0">
-          <button class="act ghost" id="rc_btn">Refresh</button>
-        </div>
-      </div>
-
-      <div class="filterbar">
-        <label>Status
-          <select id="f_status">
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="verified">Verified (any tier)</option>
-            <option value="debunked">Debunked</option>
-            <option value="insuff">Insufficient proof</option>
-            <option value="withdrawn">Withdrawn</option>
-          </select>
-        </label>
-        <label>Severity
-          <select id="f_sev">
-            <option value="all">All</option>
-            <option value="HIGH">HIGH</option>
-            <option value="MEDIUM">MEDIUM</option>
-            <option value="LOW">LOW</option>
-            <option value="DEBUNKED">DEBUNKED</option>
-            <option value="INSUFFICIENT_PROOF">INSUFF</option>
-          </select>
-        </label>
-        <label>Sort
-          <select id="f_sort">
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="payout">Highest payout</option>
-          </select>
-        </label>
-        <div class="search">
-          <label style="margin-bottom:4px">Search</label>
-          <input id="f_q" type="text" placeholder="text in summary / reason / reporter" />
-        </div>
-      </div>
-
-      <div class="status" id="rc_status"></div>
-      <div id="rc_list" class="rlist"></div>
-    </div>
-  </div>
-
   <footer>
     <div>
       <div class="ftext">
@@ -1064,6 +1177,17 @@ https://github.com/org/repo/pull/1234"></textarea>
 
 <!-- Toast stack -->
 <div class="toaster" id="toaster" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Report detail modal -->
+<div class="modal-back" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+  <div class="modal wide">
+    <div class="modal-head">
+      <h2 id="detailTitle">Report detail</h2>
+      <button class="modal-close" id="detailClose" aria-label="Close">esc ✕</button>
+    </div>
+    <div class="modal-body flush" id="detailBody"></div>
+  </div>
+</div>
 
 <!-- How it works modal -->
 <div class="modal-back" id="howModal" role="dialog" aria-modal="true" aria-labelledby="howTitle">
@@ -1302,16 +1426,22 @@ async function readContract(method, args){
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────
-document.querySelectorAll("nav.tabs button").forEach(b=>{
-  b.addEventListener("click",()=>{
-    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");
-    $("tab-"+b.dataset.tab).classList.add("active");
-    if (b.dataset.tab === "recent") loadRecent();
-    if (b.dataset.tab === "submit") tryPreviewProgram();
+function switchTab(name){
+  document.querySelectorAll("nav.tabs button").forEach(x=>{
+    x.classList.toggle("active", x.dataset.tab === name);
   });
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+  const panel = $("tab-"+name);
+  if (panel) panel.classList.add("active");
+  if (name === "explore") loadExplore();
+  if (name === "submit") tryPreviewProgram();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.addEventListener("click",()=>switchTab(b.dataset.tab));
 });
+$("pl_new").addEventListener("click", ()=>switchTab("fund"));
+$("r_browse").addEventListener("click", (e)=>{ e.preventDefault(); switchTab("explore"); });
 
 // ── Validation ────────────────────────────────────────────────────
 const URL_RE = /^https?:\/\/\S+$/i;
@@ -1402,9 +1532,45 @@ $("p_btn").addEventListener("click", async ()=>{
       pool, "Escrowing pool · opening program");
     const totals = JSON.parse(await readContract("get_totals", []));
     const pid = Math.max(totals.programs - 1, 0);
-    toast("ok","Program #"+pid+" opened","Pool escrowed. Reporters can now file against this program.");
+    toast("ok","Program #"+pid+" opened","Share the Program ID with researchers so they can file reports.");
+    showSharePanel(pid);
     loadStats();
+    loadPrograms();
   }catch(e){ console.error(e); }
+});
+
+// Persistent share panel — the Program ID is the thing a sponsor must hand out.
+function programShareLink(pid){
+  return location.origin + location.pathname + "?program=" + pid;
+}
+function showSharePanel(pid){
+  const panel = $("sharePanel");
+  $("sp_id").textContent = "#" + pid;
+  $("sp_link").value = programShareLink(pid);
+  panel.classList.add("show");
+  panel.dataset.pid = String(pid);
+  panel.scrollIntoView({behavior:"smooth", block:"center"});
+}
+$("sp_copyLink").addEventListener("click", ()=>{
+  navigator.clipboard?.writeText($("sp_link").value).then(()=>{
+    $("sp_copyLink").textContent = "Copied!";
+    setTimeout(()=>$("sp_copyLink").textContent = "Copy link", 1400);
+  });
+});
+$("sp_copyId").addEventListener("click", ()=>{
+  const pid = $("sharePanel").dataset.pid || "";
+  navigator.clipboard?.writeText(pid).then(()=>toast("info","Copied","Program ID "+pid+" copied."));
+});
+$("sp_view").addEventListener("click", ()=>{
+  const pid = $("sharePanel").dataset.pid;
+  switchTab("explore");
+  setTimeout(()=>focusProgram(pid), 200);
+});
+$("sp_another").addEventListener("click", ()=>{
+  $("sharePanel").classList.remove("show");
+  ["p_scope_url","p_scope_sum","p_pool","p_bond","p_high","p_med","p_low"].forEach(id=>$(id).value="");
+  validateAll();
+  $("p_scope_url").focus();
 });
 
 // ── 2. Submit report ─────────────────────────────────────────────
@@ -1419,42 +1585,18 @@ $("r_btn").addEventListener("click", async ()=>{
     await writeTx("submit_report", [Number(pid), summary, evidence], bond, "Staking bond · registering report");
     const totals = JSON.parse(await readContract("get_totals", []));
     const rid = Math.max(totals.reports - 1, 0);
-    toast("ok","Report #"+rid+" filed","Filed against program #"+pid+". Convene the verifier in the next tab.");
-    $("v_id").value = String(rid);
-    $("l_id").value = String(rid);
+    toast("ok","Report #"+rid+" filed","Filed against program #"+pid+". Opening it so you can convene the AI Verifier.");
+    // Reset the form for the next report.
+    ["r_summary","r_urls"].forEach(id=>$(id).value="");
+    validateAll();
     loadStats();
+    await loadPrograms();
+    switchTab("explore");
+    setTimeout(()=>openDetail(rid), 250);
   }catch(e){ console.error(e); }
 });
 
-// ── 3. Convene verifier ──────────────────────────────────────────
-$("v_btn").addEventListener("click", async ()=>{
-  const el=$("v_status"); if(!ensureReady()) return;
-  try{
-    const id = $("v_id").value.trim();
-    if (id===""){ toast("err","Report ID required","Enter the numeric report ID to convene."); return; }
-    setStatus(el,"work","AI validators fetching evidence · running triage · reaching consensus. This can take 1–3 minutes.", true);
-    const t = toast("work","Convening AI Verifier","Validators re-fetching evidence and voting…",{sticky:true});
-    let txHash;
-    try {
-      txHash = await client.writeContract({
-        address: CONTRACT_ADDRESS, functionName: "convene_verifier",
-        args: [Number(id)], value: 0n,
-      });
-      t.update("work","convene_verifier sent","Awaiting consensus… (1-3 min)",{tx:txHash, sticky:true});
-      await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
-      t.update("ok","Verdict finalized","AI Jury reached consensus on report #"+id,{tx:txHash});
-    } catch (e) {
-      t.update("err","Verifier failed", String(e.message||e), txHash ? {tx:txHash} : {});
-      throw e;
-    }
-    clearStatus(el);
-    $("l_id").value = String(id);
-    $("l_btn").click();
-    loadStats();
-  }catch(e){ setStatus(el,"err","Error: "+(e.message||e)); console.error(e);}
-});
-
-// ── Lookup / render report ───────────────────────────────────────
+// ── Convene verifier (inline, per report — no ID typing) ─────────
 const STATUS_LABEL = {
   REPORT_PENDING:            {t:"Pending",              cls:"pending"},
   REPORT_VERIFIED_HIGH:      {t:"Verified · HIGH",      cls:"high"},
@@ -1465,23 +1607,50 @@ const STATUS_LABEL = {
   REPORT_WITHDRAWN:          {t:"Withdrawn",            cls:"withdrawn"},
 };
 
-$("l_btn").addEventListener("click", async ()=>{
-  const el=$("l_status"), out=$("l_result");
-  if (!contractConfigured){ setStatus(el,"err","Contract address is not configured."); return; }
+async function conveneReport(id){
+  if(!ensureReady()) return;
+  const t = toast("work","Convening AI Verifier","Report #"+id+" · validators re-fetching evidence and voting… (1-3 min)",{sticky:true});
+  let txHash;
+  try {
+    txHash = await client.writeContract({
+      address: CONTRACT_ADDRESS, functionName: "convene_verifier",
+      args: [Number(id)], value: 0n,
+    });
+    t.update("work","convene_verifier sent","Awaiting consensus on report #"+id+"… (1-3 min)",{tx:txHash, sticky:true});
+    await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
+    t.update("ok","Verdict finalized","AI Jury reached consensus on report #"+id,{tx:txHash});
+    await loadStats();
+    await loadPrograms();
+    openDetail(id);
+  } catch (e) {
+    t.update("err","Verifier failed", String(e.message||e), txHash ? {tx:txHash} : {});
+    console.error(e);
+  }
+}
+
+// ── Report detail modal (abstracts the report ID away) ───────────
+function closeDetail(){ $("detailModal").classList.remove("show"); }
+$("detailClose").addEventListener("click", closeDetail);
+$("detailModal").addEventListener("click", (e)=>{ if (e.target === $("detailModal")) closeDetail(); });
+document.addEventListener("keydown", (e)=>{ if (e.key === "Escape") closeDetail(); });
+
+async function openDetail(id){
+  const modal = $("detailModal"), body = $("detailBody");
+  if (!contractConfigured){ toast("err","Not configured","Contract address is not configured."); return; }
+  body.innerHTML = `<div class="status show work"><span class="spin"></span><span>Reading report #${escapeHtml(String(id))} from the contract…</span></div>`;
+  modal.classList.add("show");
   try{
-    const id=$("l_id").value.trim();
-    if (id===""){ setStatus(el,"err","Report ID required."); return; }
-    setStatus(el,"work","Reading report state from contract…", true);
     const raw = await readContract("get_report",[Number(id)]);
     const d = typeof raw === "string" ? JSON.parse(raw) : raw;
     let prog = null;
     try { prog = JSON.parse(await readContract("get_program",[Number(d.program_id)])); } catch(_){}
-    clearStatus(el);
-    out.innerHTML = renderReport(id, d, prog);
-    out.scrollIntoView({behavior:"smooth", block:"start"});
-    bindCopyables(out);
-  }catch(e){ setStatus(el,"err","Report not found or error: "+(e.message||e)); out.innerHTML=""; console.error(e);}
-});
+    body.innerHTML = renderReport(id, d, prog);
+    bindCopyables(body);
+  }catch(e){
+    body.innerHTML = `<div class="status show err">Report not found or error: ${escapeHtml(String(e.message||e))}</div>`;
+    console.error(e);
+  }
+}
 
 function renderReport(id, d, prog){
   const st = STATUS_LABEL[d.status] || { t: d.status, cls: "pending" };
@@ -1531,6 +1700,13 @@ function renderReport(id, d, prog){
       <div class="ev-list">${evList || '<div class="empty">— none supplied —</div>'}</div>
     </div>`;
 
+  const isPending = d.status === "REPORT_PENDING";
+  const conveneBlock = isPending ? `
+    <div class="withdrawbtn">
+      <button class="act" data-convene="${id}">Convene the AI Verifier</button>
+      <span class="wtext">Fires the on-chain nondet block: validators re-fetch every evidence URL, re-run the security triage, and vote. Takes 1–3 minutes. Anyone can convene.</span>
+    </div>` : "";
+
   const canWithdraw = Number(d.withdrawable || 0) > 0 && d.status !== "REPORT_WITHDRAWN";
   const wdBlock = canWithdraw ? `
     <div class="withdrawbtn">
@@ -1560,6 +1736,7 @@ function renderReport(id, d, prog){
       ${reasonBlock}
       ${injBlock}
       ${evBlock}
+      ${conveneBlock}
       ${wdBlock}
     </div>
   </div>`;
@@ -1596,10 +1773,62 @@ document.addEventListener("click", async (ev)=>{
   if (!client || !account){ toast("err","Wallet required","Connect your wallet to withdraw."); return; }
   try {
     await writeTx("withdraw_report", [Number(id)], 0, "Claiming payout + bond");
-    $("l_id").value = id; $("l_btn").click();
-    loadStats();
+    await loadStats();
+    await loadPrograms();
+    openDetail(id);
   } catch(e){ console.error(e); }
 });
+
+// Convene handler (event-delegated — works from a card or the detail modal)
+document.addEventListener("click", (ev)=>{
+  const btn = ev.target.closest("[data-convene]");
+  if (!btn) return;
+  ev.stopPropagation();
+  conveneReport(btn.dataset.convene);
+});
+
+// View / program-card actions (event-delegated)
+document.addEventListener("click", (ev)=>{
+  const view = ev.target.closest("[data-view]");
+  if (view){ ev.stopPropagation(); openDetail(view.dataset.view); return; }
+  const submit = ev.target.closest("[data-submitprog]");
+  if (submit){ ev.stopPropagation(); startReportFor(submit.dataset.submitprog); return; }
+  const share = ev.target.closest("[data-shareprog]");
+  if (share){ ev.stopPropagation(); shareProgram(share.dataset.shareprog); return; }
+  const seereps = ev.target.closest("[data-progreports]");
+  if (seereps){ ev.stopPropagation(); filterReportsByProgram(seereps.dataset.progreports); return; }
+});
+
+// Pre-fill the Submit tab for a chosen program — no manual ID copying.
+function startReportFor(pid){
+  switchTab("submit");
+  $("r_pid").value = String(pid);
+  const p = allPrograms.find(x => String(x.id) === String(pid));
+  if (p && Number(p.min_bond) > 0) $("r_bond").value = String(p.min_bond);
+  tryPreviewProgram();
+  validateAll();
+  setTimeout(()=>$("r_summary").focus(), 200);
+}
+function shareProgram(pid){
+  const link = programShareLink(pid);
+  navigator.clipboard?.writeText(link).then(
+    ()=>toast("ok","Link copied","Shareable link for program #"+pid+" copied to clipboard."),
+    ()=>toast("info","Share link", link)
+  );
+}
+function filterReportsByProgram(pid){
+  $("f_prog").value = String(pid);
+  renderRecent();
+  $("rc_list").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function focusProgram(pid){
+  const card = document.querySelector(`.pcard[data-pid="${pid}"]`);
+  if (card){
+    card.scrollIntoView({behavior:"smooth", block:"center"});
+    card.style.borderColor = "var(--accent)";
+    setTimeout(()=>{ card.style.borderColor = ""; }, 1600);
+  }
+}
 
 // ── Stats strip ───────────────────────────────────────────────────
 let allReports = []; // cached for filters
@@ -1654,10 +1883,12 @@ function renderRecent(){
   const fStatus = $("f_status").value;
   const fSev = $("f_sev").value;
   const fSort = $("f_sort").value;
+  const fProg = $("f_prog").value;
   const q = $("f_q").value.trim().toLowerCase();
 
   let items = allReports.map((d, idx) => ({ id: idx, d })).filter(r => r.d);
 
+  if (fProg !== "all") items = items.filter(r => String(r.d.program_id) === String(fProg));
   if (fStatus !== "all") {
     items = items.filter(r => {
       const s = r.d.status || "";
@@ -1688,10 +1919,8 @@ function renderRecent(){
   list.innerHTML = items.map(r => renderRow(r.id, r.d)).join("");
   list.querySelectorAll("[data-open]").forEach(row => {
     row.addEventListener("click", (e) => {
-      if (e.target.closest("a") || e.target.closest("[data-copy]")) return;
-      document.querySelector('nav.tabs button[data-tab="convene"]').click();
-      $("l_id").value = row.dataset.open;
-      $("l_btn").click();
+      if (e.target.closest("a") || e.target.closest("[data-copy]") || e.target.closest("button")) return;
+      openDetail(row.dataset.open);
     });
   });
   bindCopyables(list);
@@ -1733,6 +1962,10 @@ function renderRow(id, d){
     ${summary ? `<div class="summary">${escapeHtml(summary)}</div>` : ""}
     ${reasonShort ? `<div class="reason-preview">${escapeHtml(reasonShort)}</div>` : ""}
     ${evChips ? `<div class="ev-chips">${evChips}${evMore}</div>` : ""}
+    <div class="rowactions">
+      ${d.status === "REPORT_PENDING" ? `<button class="mini-btn" data-convene="${id}">Convene AI Verifier</button>` : ""}
+      <button class="mini-btn ghost" data-view="${id}">${d.status === "REPORT_PENDING" ? "View report" : "View verdict"}</button>
+    </div>
     <div class="rowfoot">
       <span>${(d.evidence||[]).length} evidence source${(d.evidence||[]).length===1?"":"s"}</span>
       ${payoutTag}
@@ -1760,10 +1993,115 @@ async function loadRecent(){
   } catch(e){ setStatus(el,"err","Error loading list: "+(e.message||e)); console.error(e);}
 }
 $("rc_btn").addEventListener("click", loadRecent);
-["f_status","f_sev","f_sort","f_q"].forEach(id => $(id).addEventListener("input", renderRecent));
+$("pl_refresh").addEventListener("click", loadPrograms);
+["f_prog","f_status","f_sev","f_sort","f_q"].forEach(id => $(id).addEventListener("input", renderRecent));
 
-// Auto-load stats + recent so wallet-less visitors see rich content immediately.
-loadRecent().catch(()=>{});
+// ── Programs explorer ────────────────────────────────────────────
+function reportCountFor(pid){
+  return allReports.filter(r => String(r.program_id) === String(pid)).length;
+}
+function renderProgramCard(p){
+  const closed = p.status !== "PROGRAM_OPEN";
+  const nrep = reportCountFor(p.id);
+  return `
+  <div class="pcard ${closed ? "closed" : ""}" data-pid="${p.id}">
+    <div class="ptop">
+      <div class="pidwrap">
+        <span class="pidbig">#${p.id}<span class="cbtn" data-copy="${p.id}">copy id</span></span>
+        <span class="badge ${closed ? "closed" : "open"}"><span class="bdot"></span>${closed ? "Closed" : "Open"}</span>
+      </div>
+      <div style="text-align:right">
+        <div class="mono" style="font-size:10px;color:var(--muted-2);letter-spacing:.1em;text-transform:uppercase">Sponsor</div>
+        <div class="mono" style="font-size:11.5px;color:var(--muted)">${copyableAddr(p.sponsor)}</div>
+      </div>
+    </div>
+    <div class="pscope">${escapeHtml(p.scope_summary || "—")}</div>
+    <a class="pscope-url" href="${escapeAttr(p.scope_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escapeHtml(shortUrl(p.scope_url))}</a>
+    <div class="pfacts">
+      <div class="pf"><span class="k">Pool left</span><span class="v">${Number(p.pool_balance).toLocaleString()}</span></div>
+      <div class="pf"><span class="k">Min bond</span><span class="v">${Number(p.min_bond).toLocaleString()}</span></div>
+      <div class="pf"><span class="k">Reports</span><span class="v">${nrep}</span></div>
+    </div>
+    <div class="psched">
+      <span class="sevtag high">HIGH ${Number(p.high_payout).toLocaleString()}</span>
+      <span class="sevtag medium">MED ${Number(p.medium_payout).toLocaleString()}</span>
+      <span class="sevtag low">LOW ${Number(p.low_payout).toLocaleString()}</span>
+    </div>
+    <div class="pactions">
+      ${closed
+        ? `<button class="act ghost" data-progreports="${p.id}">View ${nrep} report${nrep===1?"":"s"}</button>`
+        : `<button class="act" data-submitprog="${p.id}">Submit a report</button>
+           <button class="act ghost" data-shareprog="${p.id}">Share</button>`}
+    </div>
+    ${!closed && nrep > 0 ? `<button class="mini-btn ghost" style="align-self:flex-start" data-progreports="${p.id}">View ${nrep} report${nrep===1?"":"s"}</button>` : ""}
+  </div>`;
+}
+function renderPrograms(){
+  const grid = $("pl_grid");
+  if (allPrograms.length === 0){
+    grid.innerHTML = `<div class="empty small"><div class="em-icon">◇</div>No bounty programs yet.<br><span style="color:var(--muted-2);font-size:12px">Be the first — hit “Create a Program”.</span></div>`;
+    return;
+  }
+  const sorted = allPrograms.slice().sort((a,b)=>{
+    if ((a.status==="PROGRAM_OPEN") !== (b.status==="PROGRAM_OPEN")) return a.status==="PROGRAM_OPEN" ? -1 : 1;
+    return Number(b.id) - Number(a.id);
+  });
+  grid.innerHTML = sorted.map(renderProgramCard).join("");
+  bindCopyables(grid);
+  // Populate the program filter dropdown.
+  const sel = $("f_prog");
+  const cur = sel.value;
+  sel.innerHTML = `<option value="all">All programs</option>` +
+    allPrograms.slice().sort((a,b)=>Number(a.id)-Number(b.id))
+      .map(p=>`<option value="${p.id}">#${p.id} — ${escapeHtml((p.scope_summary||"").slice(0,40))}</option>`).join("");
+  sel.value = cur && [...sel.options].some(o=>o.value===cur) ? cur : "all";
+}
+async function loadPrograms(){
+  const el = $("pl_status");
+  if (!contractConfigured){ setStatus(el,"err","Contract address is not configured."); return; }
+  try{
+    setStatus(el,"work","Reading bounty programs from the contract…", true);
+    if (allPrograms.length === 0)
+      $("pl_grid").innerHTML = `<div class="skeleton"><div class="skel"></div><div class="skel"></div></div>`;
+    await loadStats(); // refreshes allPrograms + allReports
+    clearStatus(el);
+    renderPrograms();
+  }catch(e){ setStatus(el,"err","Error loading programs: "+(e.message||e)); console.error(e); }
+}
+
+let exploreLoaded = false;
+async function loadExplore(){
+  await loadPrograms();
+  // loadStats already populated allReports; render the reports list.
+  const el=$("rc_status"), list=$("rc_list");
+  clearStatus(el);
+  if (allReports.length === 0){
+    list.innerHTML = `<div class="empty"><div class="em-icon">◇</div>No reports on this contract yet.<br><span style="color:var(--muted-2);font-size:12px">Pick a program above and submit one.</span></div>`;
+  } else {
+    renderRecent();
+  }
+  exploreLoaded = true;
+}
+
+// ── Deep links: ?program=<id> / ?report=<id> ─────────────────────
+async function handleDeepLink(){
+  const params = new URLSearchParams(location.search);
+  const rep = params.get("report");
+  const prog = params.get("program");
+  if (rep !== null && rep !== ""){
+    switchTab("explore");
+    setTimeout(()=>openDetail(rep), 400);
+  } else if (prog !== null && prog !== ""){
+    switchTab("explore");
+    setTimeout(()=>{ startReportFor(prog); }, 300);
+  }
+}
+
+// Auto-load so wallet-less visitors see the full catalog immediately.
+(async function init(){
+  await loadExplore().catch(()=>{});
+  handleDeepLink().catch(()=>{});
+})();
 
 // ── Utils ────────────────────────────────────────────────────────
 function shortAddr(a){ return a ? a.slice(0, 6) + "…" + a.slice(-4) : "—"; }

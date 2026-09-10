@@ -85,17 +85,23 @@ npm install
 VITE_CONTRACT_ADDRESS=0x<your contract> npm run dev
 ```
 
-Open the app in a browser with MetaMask installed. **Connect Wallet** — the app runs `wallet_switchEthereumChain` (falls back to `wallet_addEthereumChain`) so MetaMask lands on studionet before any signed tx. Walk the four tabs: Fund Program → Submit Report → Convene Verifier → Recent Reports.
+Open the app in a browser with MetaMask installed. **Connect Wallet** — the app runs `wallet_switchEthereumChain` (falls back to `wallet_addEthereumChain`) so MetaMask lands on studionet before any signed tx.
 
-Recent Reports uses a **wallet-less read client** — visitors browse existing verdicts without connecting.
+The UI has three tabs, built so a first-time user never has to copy a raw contract ID by hand:
+
+- **Explore** (landing) — a live catalog of every **bounty Program** (card per program: scope, pool, payout schedule, report count) *and* every **Report**. Pick a program and hit **Submit a report** → the Submit form opens with the Program ID and minimum bond pre-filled. Every report card has **View verdict** (opens the full AI-Jury detail) and, when pending, **Convene AI Verifier** right on the card. No IDs to type.
+- **Create Program** — fund a pool and lock the schedule. On success a **persistent share panel** shows the new **Program ID** big and copyable, plus a one-click **shareable link** (`?program=<id>`) to hand to researchers.
+- **Submit Report** — pre-filled when reached from Explore; program preview shown inline.
+
+**Shareable deep links:** `?program=<id>` opens the app straight on the Submit flow for that program; `?report=<id>` opens that report's verdict. Explore uses a **wallet-less read client**, so anyone can browse programs and verdicts without connecting.
 
 **Deploying live** (Vercel): point the project at the `frontend/` directory, set `VITE_CONTRACT_ADDRESS` and `VITE_CHAIN=studio` as environment variables, and build.
 
 ## 7. End-to-end demo flow
 
-1. **Sponsor** creates a Program: pool 2_000_000, HIGH 800_000, MEDIUM 300_000, LOW 50_000, min_bond 25_000.
-2. **Reporter** submits a Report against Program 0: staked bond 25_000, summary "signature-replay in AcmeSwap /api/withdraw", evidence URLs = advisory + disclosed PR.
-3. Anyone calls **Convene Verifier** → nondet block fetches every URL, runs the triage prompt, validators consensus.
+1. **Sponsor** creates a Program: pool 2_000_000, HIGH 800_000, MEDIUM 300_000, LOW 50_000, min_bond 25_000. The share panel hands back the **Program ID** + link.
+2. **Reporter** opens Explore (or the shared `?program=` link), clicks **Submit a report** on the program card (ID + bond pre-filled), and files: summary "signature-replay in AcmeSwap /api/withdraw", evidence URLs = advisory + disclosed PR.
+3. Anyone clicks **Convene AI Verifier** on the pending report card → nondet block fetches every URL, runs the triage prompt, validators consensus.
 4. Verdict written on-chain: severity HIGH, payout 800_000, reason quoting which evidence source drove the tier.
 5. Reporter calls **withdraw_report** → pull-payment for `payout + bond`.
 6. Once every report on a Program is terminal, **sponsor** calls **close_program** → residual pool returned.
